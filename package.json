@@ -27,17 +27,13 @@
     "@vue/cli-plugin-unit-mocha": "^3.0.0-beta.15",
     "@vue/cli-service": "^3.0.0-beta.15",
     "@vue/eslint-config-airbnb": "^3.0.0-beta.16",
+    "@vue/eslint-config-prettier": "^3.0.0-beta.16",
     "@vue/eslint-config-typescript": "^3.0.0-beta.16",
     "@vue/test-utils": "^1.0.0-beta.16",
     "chai": "^4.1.2",
-    "express": "^4.16.3",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
-    "url-loader": "^1.0.1",
-    "vue-loader": "^15.2.4",
-    "vue-style-loader": "^4.1.0",
-    "vue-template-compiler": "^2.5.16",
-    "webpack": "^4.12.0"
+    "vue-template-compiler": "^2.5.16"
   },
   "browserslist": [
     "> 1%",

@@ -3,13 +3,26 @@ module.exports = {
   env: {
     node: true
   },
-  'extends': [
+  // parserOptions: {
+  //   'ecmaVersion': 6
+  // },
+  // parser: 'typescript-eslint-parser',
+  // plugins: [
+  //   'vue',
+  //   'typescript'
+  // ],
+  extends: [
     'plugin:vue/essential',
-    '@vue/airbnb',
+    '@vue/prettier',
     '@vue/typescript'
   ],
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    'prettier/prettier': ['error', {
+      'singleQuote': true,
+      'trailingComma': 'all',
+      'jsxBracketSameLine': true
+    }],
   }
 }
