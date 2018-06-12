@@ -10,6 +10,7 @@
     "test:e2e": "vue-cli-service test:e2e"
   },
   "dependencies": {
+    "@types/jsonp": "^0.2.0",
     "fastclick": "^1.0.6",
     "vue": "^2.5.16",
     "vue-class-component": "^6.0.0",
