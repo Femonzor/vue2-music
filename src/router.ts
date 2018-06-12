@@ -1,7 +1,9 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Home from './views/Home.vue';
-import About from './views/About.vue';
+import Rank from './views/rank/index.vue';
+import Recommend from './views/recommend/index.vue';
+import Search from './views/search/index.vue';
+import Singer from './views/singer/index.vue';
 
 Vue.use(Router);
 
@@ -9,13 +11,27 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: Home,
+      redirect: 'recommend',
     },
     {
-      path: '/about',
-      name: 'about',
-      component: About,
+      path: '/rank',
+      name: 'rank',
+      component: Rank,
+    },
+    {
+      path: '/recommend',
+      name: 'recommend',
+      component: Recommend,
+    },
+    {
+      path: '/search',
+      name: 'search',
+      component: Search,
+    },
+    {
+      path: '/singer',
+      name: 'singer',
+      component: Singer,
     },
   ],
 });
