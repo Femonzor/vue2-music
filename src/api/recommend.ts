@@ -1,7 +1,7 @@
 import jsonp from '@/assets/js/jsonp';
 import { commonParams, options } from './config';
 
-export const getRecommend = (): Promise<any> => {
+const getRecommend = (): Promise<any> => {
   const url = 'https://c.y.qq.com/musichall/fcgi-bin/fcg_yqqhomepagerecommend.fcg';
   const data = Object.assign({}, commonParams, {
     platform: 'h5',
@@ -9,4 +9,8 @@ export const getRecommend = (): Promise<any> => {
     needNewCode: 1
   });
   return jsonp(url, data, options);
+};
+
+export default {
+  getRecommend
 };

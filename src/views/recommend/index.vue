@@ -41,68 +41,81 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import recommendApi from '@/api/recommend';
+import { ERR_OK } from '@/api/config';
 
 @Component
-export default class Recommend extends Vue {}
+export default class Recommend extends Vue {
+  async getRecommend () {
+    const response = await recommendApi.getRecommend();
+    if (response.code === ERR_OK) {
+      console.log(response.data.slider);
+    }
+  }
+
+  async created() {
+    await this.getRecommend();
+  }
+}
 </script>
 
 <style lang="stylus" scoped>
-@import "~@/assets/stylus/variable";
-@import "~@/assets/stylus/mixin";
+@import '~@/assets/stylus/variable';
+@import '~@/assets/stylus/mixin';
 
 .recommend
-  position: fixed;
-  width: 100%;
-  top: 88px;
-  bottom: 0;
+  position: fixed
+  width: 100%
+  top: 88px
+  bottom: 0
 
   .recommend-content
-    height: 100%;
-    overflow: hidden;
+    height: 100%
+    overflow: hidden
 
     .slide-wrapper
-      position: relative;
-      width: 100%;
-      overflow: hidden;
+      position: relative
+      width: 100%
+      overflow: hidden
 
     .recommend-list
       .list-title
-        height: 65px;
-        line-height: 65px;
-        text-align: center;
-        font-size: $font-size-medium;
-        color: $color-theme;
+        height: 65px
+        line-height: 65px
+        text-align: center
+        font-size: $font-size-medium
+        color: $color-theme
 
       .item
-        display: flex;
-        align-items: center;
-        box-sizing: border-box;
-        padding: 0 20px 20px 20px;
+        display: flex
+        align-items: center
+        box-sizing: border-box
+        padding: 0 20px 20px 20px
 
         .icon
-          flex: 0 0 60px;
-          width: 60px;
-          padding-right: 20px;
+          flex: 0 0 60px
+          width: 60px
+          padding-right: 20px
 
         .text
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          flex: 1;
-          line-height: 20px;
-          overflow: hidden;
-          font-size: $font-size-medium;
+          display: flex
+          flex-direction: column
+          justify-content: center
+          flex: 1
+          line-height: 20px
+          overflow: hidden
+          font-size: $font-size-medium
 
           .name
-            margin-bottom: 10px;
-            color: $color-text;
+            margin-bottom: 10px
+            color: $color-text
 
           .desc
-            color: $color-text-d;
+            color: $color-text-d
 
     .loading-container
-      position: absolute;
-      width: 100%;
-      top: 50%;
-      transform: translateY(-50%);
+      position: absolute
+      width: 100%
+      top: 50%
+      transform: translateY(-50%)
 </style>
