@@ -10,7 +10,7 @@ const param = (data: any): string => {
   return url ? url.substring(1) : '';
 };
 
-export default (url: string, data: any, options: Object): Promise<any> => {
+export default (url: string, data: any, options: Object): Promise<Object> => {
   url += (/\?/.test(url) ? '&' : '?') + param(data);
   return new Promise((resolve, reject) => {
     originJSONP(url, options, (error, data) => {

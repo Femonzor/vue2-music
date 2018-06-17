@@ -22,7 +22,8 @@ module.exports = {
     'prettier/prettier': ['error', {
       'singleQuote': true,
       'trailingComma': 'all',
-      'jsxBracketSameLine': true
+      'jsxBracketSameLine': true,
+      'printWidth': 100,
     }],
   }
 }

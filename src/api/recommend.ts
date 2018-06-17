@@ -6,11 +6,12 @@ const getRecommend = (): Promise<any> => {
   const data = Object.assign({}, commonParams, {
     platform: 'h5',
     uin: 0,
-    needNewCode: 1
+    needNewCode: 1,
   });
   return jsonp(url, data, options);
+  // return new Promise(resolve => 'a');
 };
 
 export default {
-  getRecommend
+  getRecommend,
 };
