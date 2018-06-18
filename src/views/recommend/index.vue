@@ -1,7 +1,16 @@
 <template>
   <div class="recommend">
     <div class="recommend-content">
-      <div class="slider-wrapper"></div>
+      <div v-if="recommends.length" class="slider-wrapper">
+        <slider>
+          <div v-for="recommend in recommends" :key="recommend.id">
+            <a :href="recommend.linkUrl">
+              <!-- <img @load="loadImg" :src="recommend.picUrl" class="needsclick" alt=""> -->
+              <img :src="recommend.picUrl">
+            </a>
+          </div>
+        </slider>
+      </div>
       <div class="recommend-list">
         <h1 class="list-title">热门歌单推荐</h1>
         <ul></ul>
@@ -41,15 +50,21 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
+import Slider from '@/base/slider/index.vue';
 import recommendApi from '@/api/recommend';
 import { ERR_OK } from '@/api/config';
 
-@Component
+@Component({
+  components: {
+    Slider,
+  },
+})
 export default class Recommend extends Vue {
-  async getRecommend () {
+  recommends = [];
+  async getRecommend() {
     const response = await recommendApi.getRecommend();
     if (response.code === ERR_OK) {
-      console.log(response.data.slider);
+      this.recommends = response.data.slider;
     }
   }
 
@@ -73,7 +88,7 @@ export default class Recommend extends Vue {
     height: 100%
     overflow: hidden
 
-    .slide-wrapper
+    .slider-wrapper
       position: relative
       width: 100%
       overflow: hidden
