@@ -14,14 +14,17 @@ import { addClass } from '@/assets/js/dom';
 
 @Component
 export default class Slider extends Vue {
+  slider!: BScroll;
+  children!: Array<HTMLElement>;
   @Prop({ default: true })
-  loop!: Boolean;
+  loop!: boolean;
   @Prop({ default: true })
-  autoPlay!: Boolean;
+  autoPlay!: boolean;
   @Prop({ default: 4000 })
-  interval!: Number;
+  interval!: number;
 
   $refs: any = {
+    slider: HTMLElement,
     sliderGroup: HTMLElement,
   };
 
@@ -33,11 +36,11 @@ export default class Slider extends Vue {
   }
 
   setSliderWidth() {
-    let children = this.$refs.sliderGroup.children;
+    this.children = this.$refs.sliderGroup.children;
     let width = 0;
     let sliderWidth = this.$refs.slider.clientWidth;
-    for (let i = 0, len = children.length; i < len; i++) {
-      let child = children[i];
+    for (let i = 0, len = this.children.length; i < len; i++) {
+      const child: HTMLElement = this.children[i];
       addClass(child, 'slider-item');
       child.style.width = sliderWidth + 'px';
       width += sliderWidth;
@@ -47,7 +50,19 @@ export default class Slider extends Vue {
     }
     this.$refs.sliderGroup.style.width = width + 'px';
   }
-  initSlider() {}
+  initSlider() {
+    this.slider = new BScroll(this.$refs.slider, {
+      scrollX: true,
+      scrollY: false,
+      momentum: false,
+      snap: {
+        loop: this.loop,
+        threshold: 0.3,
+        speed: 400,
+      },
+      click: true,
+    });
+  }
 }
 </script>
 
