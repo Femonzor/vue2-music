@@ -68,8 +68,18 @@ export default class Recommend extends Vue {
     }
   }
 
+  async getDiscList() {
+    const response = await recommendApi.getDiscList();
+    if (response.code === ERR_OK) {
+      console.log(response.data.list);
+    } else {
+      console.log(response);
+    }
+  }
+
   async created() {
     await this.getRecommend();
+    await this.getDiscList();
   }
 }
 </script>

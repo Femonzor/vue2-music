@@ -6,4 +6,18 @@ module.exports = {
       filename: 'index.html',
     },
   },
+  devServer: {
+    proxy: {
+      '/api': {
+        headers: {
+          referer: 'https://y.qq.com/portal/playlist.html',
+        },
+        target: 'https://c.y.qq.com',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api': '',
+        },
+      },
+    },
+  },
 };

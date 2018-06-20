@@ -46,6 +46,10 @@ export default class Slider extends Vue {
     }, 20);
   }
 
+  destroyed() {
+    console.log('slider destroyed');
+  }
+
   setSliderWidth() {
     this.children = this.$refs.sliderGroup.children;
     let childrenLength: number = this.children.length;
@@ -61,7 +65,6 @@ export default class Slider extends Vue {
       const child: HTMLElement = this.children[i];
       addClass(child, 'slider-item');
       child.style.width = sliderWidth;
-      // width += sliderWidth;
     }
     this.$refs.sliderGroup.style.width = sliderGroupWidth;
   }
