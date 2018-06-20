@@ -25,5 +25,6 @@ module.exports = {
       'jsxBracketSameLine': true,
       'printWidth': 100,
     }],
+    'vue/no-unused-vars': 'off',
   }
 }

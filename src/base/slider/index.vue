@@ -3,7 +3,9 @@
     <div class="slider-group" ref="sliderGroup">
       <slot></slot>
     </div>
-    <div class="dots"></div>
+    <div class="dots">
+      <span class="dot" v-for="item in dots" :key="item" :class="{active: currentPageIndex === item}"></span>
+    </div>
   </div>
 </template>
 
@@ -11,11 +13,16 @@
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import BScroll from 'better-scroll';
 import { addClass } from '@/assets/js/dom';
+import { setTimeout, clearTimeout, clearInterval } from 'timers';
 
 @Component
 export default class Slider extends Vue {
   slider!: BScroll;
   children!: Array<HTMLElement>;
+  timer!: NodeJS.Timer;
+  dots: Array<number> = [];
+  currentPageIndex: number = 0;
+
   @Prop({ default: true })
   loop!: boolean;
   @Prop({ default: true })
@@ -31,25 +38,41 @@ export default class Slider extends Vue {
   mounted() {
     setTimeout(() => {
       this.setSliderWidth();
+      this.initDots();
       this.initSlider();
+      if (this.autoPlay) {
+        this.play();
+      }
     }, 20);
   }
 
   setSliderWidth() {
     this.children = this.$refs.sliderGroup.children;
-    let width = 0;
-    let sliderWidth = this.$refs.slider.clientWidth;
+    let childrenLength: number = this.children.length;
+    let sliderWidth, sliderGroupWidth;
+    if (this.loop) {
+      sliderWidth = 100 / (childrenLength + 2) + '%';
+      sliderGroupWidth = 100 * (childrenLength + 2) + '%';
+    } else {
+      sliderWidth = 100 / childrenLength + '%';
+      sliderGroupWidth = 100 * childrenLength + '%';
+    }
     for (let i = 0, len = this.children.length; i < len; i++) {
       const child: HTMLElement = this.children[i];
       addClass(child, 'slider-item');
-      child.style.width = sliderWidth + 'px';
-      width += sliderWidth;
+      child.style.width = sliderWidth;
+      // width += sliderWidth;
     }
-    if (this.loop) {
-      width += 2 * sliderWidth;
-    }
-    this.$refs.sliderGroup.style.width = width + 'px';
+    this.$refs.sliderGroup.style.width = sliderGroupWidth;
   }
+
+  initDots() {
+    this.dots = Array(this.children.length)
+      .join(' ')
+      .split(' ')
+      .map((item, index) => index);
+  }
+
   initSlider() {
     this.slider = new BScroll(this.$refs.slider, {
       scrollX: true,
@@ -62,6 +85,21 @@ export default class Slider extends Vue {
       },
       click: true,
     });
+    this.slider.on('scrollEnd', () => {
+      const pageIndex = this.slider.getCurrentPage().pageX;
+      this.currentPageIndex = pageIndex;
+      if (this.autoPlay) {
+        this.play();
+      }
+    });
+  }
+
+  play() {
+    clearTimeout(this.timer);
+    let pageIndex = this.currentPageIndex;
+    this.timer = setTimeout(() => {
+      this.slider.next();
+    }, this.interval);
   }
 }
 </script>
