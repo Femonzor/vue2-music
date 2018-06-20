@@ -1,77 +1,65 @@
 <template>
   <div class="recommend">
-    <div class="recommend-content">
-      <div v-if="recommends.length" class="slider-wrapper">
-        <slider>
-          <div v-for="recommend in recommends" :key="recommend.id">
-            <a :href="recommend.linkUrl">
-              <!-- <img @load="loadImg" :src="recommend.picUrl" class="needsclick" alt=""> -->
-              <img :src="recommend.picUrl">
-            </a>
-          </div>
-        </slider>
-      </div>
-      <div class="recommend-list">
-        <h1 class="list-title">热门歌单推荐</h1>
-        <ul></ul>
-      </div>
-    </div>
-  </div>
-  <!-- <div class="recommend">
-    <scroll class="recommend-content" :data="discList">
+    <scroll class="recommend-content" :data="discs">
       <div>
-        <div v-if="recommends.length" class="slide-wrapper">
-          <slide>
-            <div v-for="recommend in recommends">
+        <div v-if="recommends.length" class="slider-wrapper">
+          <slider>
+            <div v-for="recommend in recommends" :key="recommend.id">
               <a :href="recommend.linkUrl">
-                <img @load="loadImg" :src="recommend.picUrl" class="needsclick" alt="">
+                <!-- <img @load="loadImg" :src="recommend.picUrl" class="needsclick" alt=""> -->
+                <img :src="recommend.picUrl">
               </a>
             </div>
-          </slide>
+          </slider>
         </div>
         <div class="recommend-list">
           <h1 class="list-title">热门歌单推荐</h1>
           <ul>
-            <li v-for="item in discList" class="item">
+            <li v-for="disc in discs" :key="disc.dissid" class="item">
               <div class="icon">
-                <img :src="item.imgUrl" alt="" style="width:60px;height:60px;">
+                <img :src="disc.imgurl" alt="" style="width:60px;height:60px;">
               </div>
               <div class="text">
-                <h2 class="name" v-html="item.creator.name"></h2>
-                <p class="desc" v-html="item.dissname"></p>
+                <h2 class="name" v-html="disc.creator.name"></h2>
+                <p class="desc" v-html="disc.dissname"></p>
               </div>
             </li>
           </ul>
         </div>
       </div>
     </scroll>
-  </div> -->
+  </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import Slider from '@/base/slider/index.vue';
+import Scroll from '@/base/scroll/index.vue';
 import recommendApi from '@/api/recommend';
 import { ERR_OK } from '@/api/config';
 
 @Component({
   components: {
     Slider,
+    Scroll,
   },
 })
 export default class Recommend extends Vue {
   recommends = [];
+  discs = [];
   async getRecommend() {
     const response = await recommendApi.getRecommend();
     if (response.code === ERR_OK) {
       this.recommends = response.data.slider;
+    } else {
+      console.log(response);
     }
   }
 
-  async getDiscList() {
-    const response = await recommendApi.getDiscList();
+  async getDiscByTag() {
+    const response = await recommendApi.getDiscByTag();
     if (response.code === ERR_OK) {
-      console.log(response.data.list);
+      this.discs = response.data.list;
     } else {
       console.log(response);
     }
@@ -79,7 +67,7 @@ export default class Recommend extends Vue {
 
   async created() {
     await this.getRecommend();
-    await this.getDiscList();
+    await this.getDiscByTag();
   }
 }
 </script>

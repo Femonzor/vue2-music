@@ -12,7 +12,7 @@ const getRecommend = (): Promise<any> => {
   return jsonp(url, data, options);
 };
 
-const getDiscList = (): Promise<any> => {
+const getDiscByTag = (): Promise<any> => {
   const url = '/api/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg';
   const data = Object.assign({}, commonParams, {
     rnd: Math.random(),
@@ -23,6 +23,7 @@ const getDiscList = (): Promise<any> => {
     sortId: 5,
     needNewCode: 0,
     categoryId: 10000000,
+    format: 'json',
   });
   return axios
     .get(url, {
@@ -33,10 +34,11 @@ const getDiscList = (): Promise<any> => {
     })
     .catch(error => {
       console.log(error);
+      return Promise.reject(error);
     });
 };
 
 export default {
   getRecommend,
-  getDiscList,
+  getDiscByTag,
 };
