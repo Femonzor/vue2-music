@@ -1,12 +1,11 @@
 <template>
   <div class="recommend">
-    <scroll class="recommend-content" :data="discs">
+    <scroll class="recommend-content">
       <div>
         <div v-if="recommends.length" class="slider-wrapper">
           <slider>
             <div v-for="recommend in recommends" :key="recommend.id">
               <a :href="recommend.linkUrl">
-                <!-- <img @load="loadImg" :src="recommend.picUrl" class="needsclick" alt=""> -->
                 <img :src="recommend.picUrl">
               </a>
             </div>
@@ -17,7 +16,7 @@
           <ul>
             <li v-for="disc in discs" :key="disc.dissid" class="item">
               <div class="icon">
-                <img :src="disc.imgurl" alt="" style="width:60px;height:60px;">
+                <img v-lazy="disc.imgurl" :alt="disc.dissname" style="width:60px;height:60px;">
               </div>
               <div class="text">
                 <h2 class="name" v-html="disc.creator.name"></h2>

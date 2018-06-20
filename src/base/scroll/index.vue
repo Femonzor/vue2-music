@@ -32,18 +32,13 @@ export default class Scroll extends Vue {
   };
 
   mounted() {
-    console.log('222');
     setTimeout(() => {
       this.initScroll();
     }, 20);
   }
 
   initScroll() {
-    if (!this.$refs.wrapper) {
-      console.log('111');
-      return;
-    }
-    console.log('222');
+    if (!this.$refs.wrapper) return;
     this.scroll = new BScroll(this.$refs.wrapper, {
       probeType: this.probeType,
       click: this.click,
