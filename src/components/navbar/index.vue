@@ -1,9 +1,9 @@
 <template>
   <div class="navbar">
-    <router-link tag="div" class="nav-item" :to="{ name: 'recommend' }">
+    <router-link tag="div" class="nav-item" :to="{ name: 'recommends' }">
       <span class="nav-link">推荐</span>
     </router-link>
-    <router-link tag="div" class="nav-item" :to="{ name: 'singer' }">
+    <router-link tag="div" class="nav-item" :to="{ name: 'singers' }">
       <span class="nav-link">歌手</span>
     </router-link>
     <router-link tag="div" class="nav-item" :to="{ name: 'rank' }">

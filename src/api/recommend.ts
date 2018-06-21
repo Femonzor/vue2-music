@@ -2,7 +2,7 @@ import jsonp from '@/assets/js/jsonp';
 import { commonParams, options } from './config';
 import axios from 'axios';
 
-const getRecommend = (): Promise<any> => {
+const getRecommends = (): Promise<any> => {
   const url = 'https://c.y.qq.com/musichall/fcgi-bin/fcg_yqqhomepagerecommend.fcg';
   const data = Object.assign({}, commonParams, {
     platform: 'h5',
@@ -12,7 +12,7 @@ const getRecommend = (): Promise<any> => {
   return jsonp(url, data, options);
 };
 
-const getDiscByTag = (): Promise<any> => {
+const getDiscsByTag = (): Promise<any> => {
   const url = '/api/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg';
   const data = Object.assign({}, commonParams, {
     rnd: Math.random(),
@@ -39,6 +39,6 @@ const getDiscByTag = (): Promise<any> => {
 };
 
 export default {
-  getRecommend,
-  getDiscByTag,
+  getRecommends,
+  getDiscsByTag,
 };

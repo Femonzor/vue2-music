@@ -1,6 +1,6 @@
 <template>
-  <div class="recommend">
-    <scroll class="recommend-content">
+  <div class="recommends">
+    <scroll class="recommends-content">
       <div>
         <div v-if="recommends.length" class="slider-wrapper">
           <slider>
@@ -26,6 +26,9 @@
           </ul>
         </div>
       </div>
+      <div class="loading-wrapper" v-show="!discs.length">
+        <loading></loading>
+      </div>
     </scroll>
   </div>
 </template>
@@ -34,6 +37,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import Slider from '@/base/slider/index.vue';
 import Scroll from '@/base/scroll/index.vue';
+import Loading from '@/base/loading/index.vue';
 import recommendApi from '@/api/recommend';
 import { ERR_OK } from '@/api/config';
 
@@ -41,13 +45,14 @@ import { ERR_OK } from '@/api/config';
   components: {
     Slider,
     Scroll,
+    Loading,
   },
 })
-export default class Recommend extends Vue {
+export default class Recommends extends Vue {
   recommends = [];
   discs = [];
-  async getRecommend() {
-    const response = await recommendApi.getRecommend();
+  async getRecommends() {
+    const response = await recommendApi.getRecommends();
     if (response.code === ERR_OK) {
       this.recommends = response.data.slider;
     } else {
@@ -55,8 +60,8 @@ export default class Recommend extends Vue {
     }
   }
 
-  async getDiscByTag() {
-    const response = await recommendApi.getDiscByTag();
+  async getDiscsByTag() {
+    const response = await recommendApi.getDiscsByTag();
     if (response.code === ERR_OK) {
       this.discs = response.data.list;
     } else {
@@ -65,8 +70,8 @@ export default class Recommend extends Vue {
   }
 
   async created() {
-    await this.getRecommend();
-    await this.getDiscByTag();
+    await this.getRecommends();
+    await this.getDiscsByTag();
   }
 }
 </script>
@@ -75,13 +80,13 @@ export default class Recommend extends Vue {
 @import '~@/assets/stylus/variable';
 @import '~@/assets/stylus/mixin';
 
-.recommend
+.recommends
   position: fixed
   width: 100%
   top: 88px
   bottom: 0
 
-  .recommend-content
+  .recommends-content
     height: 100%
     overflow: hidden
 
@@ -125,7 +130,7 @@ export default class Recommend extends Vue {
           .desc
             color: $color-text-d
 
-    .loading-container
+    .loading-wrapper
       position: absolute
       width: 100%
       top: 50%
