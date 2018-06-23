@@ -11,14 +11,14 @@ import { setTimeout } from 'timers';
 
 @Component
 export default class Scroll extends Vue {
-  scroll!: BScroll;
+  private scroll!: BScroll;
 
   @Prop({ default: 1 })
-  probeType!: number;
+  private probeType!: number;
   @Prop({ default: true })
-  click!: true;
+  private click!: true;
   @Prop({ default: () => [] })
-  data!: Array<Object>;
+  private data!: Array<Object>;
 
   @Watch('data')
   onDataChanged() {

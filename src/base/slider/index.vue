@@ -17,18 +17,18 @@ import { setTimeout, clearTimeout, clearInterval } from 'timers';
 
 @Component
 export default class Slider extends Vue {
-  slider!: BScroll;
-  children!: Array<HTMLElement>;
-  timer!: NodeJS.Timer;
-  dots: Array<number> = [];
-  currentPageIndex: number = 0;
+  private slider!: BScroll;
+  private children!: Array<HTMLElement>;
+  private timer!: NodeJS.Timer;
+  private dots: Array<number> = [];
+  private currentPageIndex: number = 0;
 
   @Prop({ default: true })
-  loop!: boolean;
+  private loop!: boolean;
   @Prop({ default: true })
-  autoPlay!: boolean;
+  private autoPlay!: boolean;
   @Prop({ default: 4000 })
-  interval!: number;
+  private interval!: number;
 
   $refs: any = {
     slider: HTMLElement,

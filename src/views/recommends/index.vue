@@ -49,8 +49,8 @@ import { ERR_OK } from '@/api/config';
   },
 })
 export default class Recommends extends Vue {
-  recommends = [];
-  discs = [];
+  private recommends = [];
+  private discs = [];
   async getRecommends() {
     const response = await recommendApi.getRecommends();
     if (response.code === ERR_OK) {
