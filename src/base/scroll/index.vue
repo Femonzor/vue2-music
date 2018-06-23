@@ -48,13 +48,17 @@ export default class Scroll extends Vue {
   enable() {
     this.scroll && this.scroll.enable();
   }
-
   disable() {
     this.scroll && this.scroll.disable();
   }
-
   refresh() {
     this.scroll && this.scroll.refresh();
+  }
+  scrollTo() {
+    this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments);
+  }
+  scrollToElement() {
+    this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments);
   }
 }
 </script>

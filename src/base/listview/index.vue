@@ -1,7 +1,7 @@
 <template>
-  <scroll class="listview">
+  <scroll class="listview" ref="listview">
     <ul>
-      <li v-for="group in data" class="list-group" :key="group.title">
+      <li v-for="group in data" class="list-group" :key="group.title" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
           <li class="list-group-item" v-for="item in group.items" :key="item.id">
@@ -11,12 +11,21 @@
         </ul>
       </li>
     </ul>
+    <div class="list-shortcut" @touchstart="onShortcutTouchStart" @touchmove.stop.prevent="onShortcutTouchMove">
+      <ul>
+        <li class="item" v-for="(item, index) in shortcutList" :key="item" :data-index="index">{{item}}</li>
+      </ul>
+    </div>
   </scroll>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator';
 import Scroll from '@/base/scroll/index.vue';
+import { getData } from '@/assets/js/dom';
+
+/** set accroding to style */
+const ANCHOR_HEIGHT: number = 18;
 
 @Component({
   components: {
@@ -24,8 +33,42 @@ import Scroll from '@/base/scroll/index.vue';
   },
 })
 export default class ListView extends Vue {
+  touch: Music.TouchMove = {
+    y1: 0,
+    y2: 0,
+    anchorIndex: 0,
+  };
+
   @Prop({ default: () => [] })
-  private data!: Array<Object>;
+  private data!: Array<any>;
+
+  $refs: any = {
+    listview: Scroll,
+  };
+
+  onShortcutTouchStart(event: TouchEvent) {
+    const anchorIndex = getData(event.target, 'index');
+    const firstTouch = event.touches[0];
+    this.touch.y1 = firstTouch.pageY;
+    if (anchorIndex) {
+      this.touch.anchorIndex = +anchorIndex;
+      this.scrollTo(this.touch.anchorIndex);
+    }
+  }
+  onShortcutTouchMove(event: TouchEvent) {
+    const firstTouch = event.touches[0];
+    this.touch.y2 = firstTouch.pageY;
+    const delta = ((this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT) | 0;
+    const anchorIndex = this.touch.anchorIndex + delta;
+    this.scrollTo(anchorIndex);
+  }
+  scrollTo(index: number) {
+    this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0);
+  }
+
+  get shortcutList() {
+    return this.data.map(group => group.title.substr(0, 1));
+  }
 }
 </script>
 

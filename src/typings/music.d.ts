@@ -13,4 +13,10 @@ declare namespace Music {
   export interface SingerMap {
     [index: string]: SingerGroup,
   }
+
+  export interface TouchMove {
+    y1: number,
+    y2: number,
+    anchorIndex: number,
+  }
 }
