@@ -11,7 +11,7 @@
         </ul>
       </li>
     </ul>
-    <div class="list-shortcut" @touchstart="onShortcutTouchStart" @touchmove.stop.prevent="onShortcutTouchMove">
+    <div class="list-shortcut" @click="onShortcutClick" @touchmove.stop.prevent="onShortcutTouchMove">
       <ul>
         <li class="item" v-for="(item, index) in shortcutList" :key="item" :data-index="index">{{item}}</li>
       </ul>
@@ -46,10 +46,9 @@ export default class ListView extends Vue {
     listview: Scroll,
   };
 
-  onShortcutTouchStart(event: TouchEvent) {
+  onShortcutClick(event: MouseEvent) {
     const anchorIndex = getData(event.target, 'index');
-    const firstTouch = event.touches[0];
-    this.touch.y1 = firstTouch.pageY;
+    this.touch.y1 = event.pageY;
     if (anchorIndex) {
       this.touch.anchorIndex = +anchorIndex;
       this.scrollTo(this.touch.anchorIndex);
@@ -63,7 +62,7 @@ export default class ListView extends Vue {
     this.scrollTo(anchorIndex);
   }
   scrollTo(index: number) {
-    this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0);
+    this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 1);
   }
 
   get shortcutList() {
