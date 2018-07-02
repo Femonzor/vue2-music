@@ -19,6 +19,8 @@ export default class Scroll extends Vue {
   private click!: true;
   @Prop({ default: () => [] })
   private data!: Array<Object>;
+  @Prop({ default: false })
+  private listenScroll!: boolean;
 
   @Watch('data')
   onDataChanged() {
@@ -43,6 +45,11 @@ export default class Scroll extends Vue {
       probeType: this.probeType,
       click: this.click,
     });
+    if (this.listenScroll) {
+      this.scroll.on('scroll', position => {
+        this.$emit('scroll', position);
+      });
+    }
   }
 
   enable() {
