@@ -44,6 +44,7 @@ export default class ListView extends Vue {
   private scrollY: number = -1;
   private currentIndex: number = 0;
   private listHeight: Array<number> = [];
+  private shortcutListHeight: Array<number> = [];
   private probeType: number = 3;
 
   @Prop({ default: () => [] })
@@ -59,7 +60,7 @@ export default class ListView extends Vue {
     for (i = 0, len = this.listHeight.length - 1; i < len; i++) {
       let height = this.listHeight[i];
       let nextHeight = this.listHeight[i + 1];
-      if (-val > height && -val < nextHeight) {
+      if (-val >= height && -val < nextHeight) {
         this.currentIndex = i;
         return;
       }
@@ -72,15 +73,16 @@ export default class ListView extends Vue {
   };
 
   updated() {
-    this.shortcutListTop = this.$refs.shortcutList.getBoundingClientRect().top;
-    this.calculateHeight();
+    if (!this.shortcutListTop) {
+      this.shortcutListTop = this.$refs.shortcutList.getBoundingClientRect().top;
+    }
+    if (!this.listHeight.length) {
+      this.calculateHeight();
+    }
   }
 
   onShortcutTouchStart(event: TouchEvent) {
     const anchorIndex = getData(event.target, 'index');
-    this.touch.y1 =
-      this.shortcutListTop +
-      (((event.touches[0].pageY - this.shortcutListTop) / ANCHOR_HEIGHT) | 0) * ANCHOR_HEIGHT;
     if (anchorIndex) {
       this.touch.anchorIndex = +anchorIndex;
       setTimeout(() => {
@@ -89,24 +91,44 @@ export default class ListView extends Vue {
     }
   }
   onShortcutTouchMove(event: TouchEvent) {
-    this.touch.y2 = event.touches[0].pageY;
-    const delta = ((this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT) | 0;
-    const anchorIndex = this.touch.anchorIndex + delta;
+    const distY = event.touches[0].pageY - this.shortcutListTop;
+    let anchorIndex: number = 0;
+    let i, len;
+    if (distY < 0) {
+      anchorIndex = 0;
+    } else {
+      for (i = 0, len = this.shortcutListHeight.length - 1; i < len; i++) {
+        if (distY > this.shortcutListHeight[i] && distY <= this.shortcutListHeight[i + 1]) {
+          break;
+        }
+      }
+      anchorIndex = i;
+    }
     this.scrollTo(anchorIndex);
   }
   scroll(position: BScroll.Position) {
     this.scrollY = position.y;
   }
   scrollTo(index: number) {
+    if (index < 0) {
+      index = 0;
+    } else if (index > this.listHeight.length - 2) {
+      index = this.listHeight.length - 2;
+    }
+    this.scrollY = -this.listHeight[index];
     this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 1);
   }
   calculateHeight() {
     const list = this.$refs.listGroup;
-    let height = 0;
+    let height = 0,
+      shortcutHeight = 0;
     this.listHeight.push(height);
+    this.shortcutListHeight.push(shortcutHeight);
     list.forEach((item: HTMLElement) => {
       height += item.clientHeight;
+      shortcutHeight += ANCHOR_HEIGHT;
       this.listHeight.push(height);
+      this.shortcutListHeight.push(shortcutHeight);
     });
   }
 
