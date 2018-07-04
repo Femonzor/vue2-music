@@ -10,7 +10,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import singerApi from '@/api/singer';
 import { ERR_OK } from '@/api/config';
 import Singer from '@/assets/js/singer';
-import ListView from '@/base/listview/index.vue';
+import ListView from '@/base/listview/listview.vue';
 
 const HOT_NAME = '热门';
 const HOT_SINGER_LENGTH = 10;

@@ -10,8 +10,8 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator';
-import MainHeader from '@/components/main-header/index.vue';
-import Navbar from '@/components/navbar/index.vue';
+import MainHeader from '@/components/main-header/main-header.vue';
+import Navbar from '@/components/navbar/navbar.vue';
 
 @Component({
   components: {

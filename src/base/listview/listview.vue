@@ -27,8 +27,8 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
-import Scroll from '@/base/scroll/index.vue';
-import Loading from '@/base/loading/index.vue';
+import Scroll from '@/base/scroll/scroll.vue';
+import Loading from '@/base/loading/loading.vue';
 import { getData } from '@/assets/js/dom';
 import { setTimeout } from 'timers';
 

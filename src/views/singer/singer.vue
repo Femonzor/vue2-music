@@ -8,8 +8,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 
 @Component
-export default class Singer extends Vue {
-}
+export default class Singer extends Vue {}
 </script>
 
 <style lang="stylus" scoped>

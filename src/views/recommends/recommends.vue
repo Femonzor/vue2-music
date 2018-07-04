@@ -35,9 +35,9 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import Slider from '@/base/slider/index.vue';
-import Scroll from '@/base/scroll/index.vue';
-import Loading from '@/base/loading/index.vue';
+import Slider from '@/base/slider/slider.vue';
+import Scroll from '@/base/scroll/scroll.vue';
+import Loading from '@/base/loading/loading.vue';
 import recommendApi from '@/api/recommend';
 import { ERR_OK } from '@/api/config';
 
