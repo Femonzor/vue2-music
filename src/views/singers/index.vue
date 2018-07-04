@@ -1,6 +1,7 @@
 <template>
   <div class="singers">
-    <list-view :data="singers"></list-view>
+    <list-view @select="selectSinger" :data="singers"></list-view>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -63,6 +64,11 @@ export default class Singers extends Vue {
     }
     otherGroup.sort((a, b) => a.title.charCodeAt(0) - b.title.charCodeAt(0));
     return hotGroup.concat(otherGroup);
+  }
+  selectSinger(singer: Music.Singer) {
+    this.$router.push({
+      path: `/singers/${singer.id}`,
+    });
   }
 
   async created() {

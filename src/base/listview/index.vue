@@ -4,7 +4,7 @@
       <li v-for="group in data" class="list-group" :key="group.title" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
-          <li class="list-group-item" v-for="item in group.items" :key="item.id">
+          <li @click="selectItem(item)" class="list-group-item" v-for="item in group.items" :key="item.id">
             <img v-lazy="item.avatar" :alt="item.name" class="avatar">
             <span class="name">{{item.name}}</span>
           </li>
@@ -16,36 +16,43 @@
         <li class="item" :class="{current: currentIndex === index}" v-for="(item, index) in shortcutList" :key="item" :data-index="index">{{item}}</li>
       </ul>
     </div>
+    <div class="list-fixed" v-show="fixedTitle" ref="fixedTitle">
+      <h1 class="fixed-title">{{fixedTitle}}</h1>
+    </div>
+    <div class="loading-wrapper" v-show="!data.length">
+      <loading></loading>
+    </div>
   </scroll>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 import Scroll from '@/base/scroll/index.vue';
+import Loading from '@/base/loading/index.vue';
 import { getData } from '@/assets/js/dom';
 import { setTimeout } from 'timers';
 
 /** set accroding to style */
 const ANCHOR_HEIGHT: number = 18;
+const FIXED_TITLE_HEIGHT: number = 30;
 
 @Component({
   components: {
     Scroll,
+    Loading,
   },
 })
 export default class ListView extends Vue {
-  private touch: Music.TouchMove = {
-    y1: 0,
-    y2: 0,
-    anchorIndex: 0,
-  };
+  private anchorIndex: number = 0;
   private shortcutListTop: number = 0;
   private listenScroll: boolean = true;
   private scrollY: number = -1;
   private currentIndex: number = 0;
   private listHeight: Array<number> = [];
   private shortcutListHeight: Array<number> = [];
+  private diff: number = -1;
   private probeType: number = 3;
+  private fixedTop: number = 0;
 
   @Prop({ default: () => [] })
   private data!: Array<any>;
@@ -62,10 +69,18 @@ export default class ListView extends Vue {
       let nextHeight = this.listHeight[i + 1];
       if (-val >= height && -val < nextHeight) {
         this.currentIndex = i;
+        this.diff = nextHeight + val;
         return;
       }
     }
     this.currentIndex = len - 2;
+  }
+  @Watch('diff')
+  onDiffChanged(val: number) {
+    let fixedTop = val > 0 && val < FIXED_TITLE_HEIGHT ? val - FIXED_TITLE_HEIGHT : 0;
+    if (this.fixedTop === fixedTop) return;
+    this.fixedTop = fixedTop;
+    this.$refs.fixedTitle.style.transform = `translate3d(0, ${fixedTop}px, 0)`;
   }
 
   $refs: any = {
@@ -84,9 +99,9 @@ export default class ListView extends Vue {
   onShortcutTouchStart(event: TouchEvent) {
     const anchorIndex = getData(event.target, 'index');
     if (anchorIndex) {
-      this.touch.anchorIndex = +anchorIndex;
+      this.anchorIndex = +anchorIndex;
       setTimeout(() => {
-        this.scrollTo(this.touch.anchorIndex);
+        this.scrollTo(this.anchorIndex);
       }, 16);
     }
   }
@@ -98,7 +113,7 @@ export default class ListView extends Vue {
       anchorIndex = 0;
     } else {
       for (i = 0, len = this.shortcutListHeight.length - 1; i < len; i++) {
-        if (distY > this.shortcutListHeight[i] && distY <= this.shortcutListHeight[i + 1]) {
+        if (distY >= this.shortcutListHeight[i] && distY < this.shortcutListHeight[i + 1]) {
           break;
         }
       }
@@ -131,9 +146,16 @@ export default class ListView extends Vue {
       this.shortcutListHeight.push(shortcutHeight);
     });
   }
+  selectItem(item: Music.Singer) {
+    this.$emit('select', item);
+  }
 
   get shortcutList() {
     return this.data.map(group => group.title.substr(0, 1));
+  }
+  get fixedTitle() {
+    if (this.scrollY > 0) return '';
+    return this.data[this.currentIndex] ? this.data[this.currentIndex].title : '';
   }
 }
 </script>
@@ -199,7 +221,7 @@ export default class ListView extends Vue {
       font-size: $font-size-small
       color: $color-text-l
       background: $color-highlight-background
-  .loading-container
+  .loading-wrapper
     position: absolute
     width: 100%
     top: 50%
