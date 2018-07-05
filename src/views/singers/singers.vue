@@ -11,6 +11,8 @@ import singerApi from '@/api/singer';
 import { ERR_OK } from '@/api/config';
 import Singer from '@/assets/js/singer';
 import ListView from '@/base/listview/listview.vue';
+import { Mutation } from 'vuex-class';
+import { SET_SINGER } from '@/store/types';
 
 const HOT_NAME = '热门';
 const HOT_SINGER_LENGTH = 10;
@@ -21,6 +23,7 @@ const HOT_SINGER_LENGTH = 10;
   },
 })
 export default class Singers extends Vue {
+  @Mutation private [SET_SINGER]!: (singer: Music.Singer) => void;
   singers: Music.SingerGroup[] = [];
 
   async getSingers() {
@@ -31,7 +34,6 @@ export default class Singers extends Vue {
       console.log(response);
     }
   }
-
   normalizeSingers(list: Array<any>): Music.SingerGroup[] {
     let map: Music.SingerMap = {};
     map.hot = {
@@ -69,6 +71,7 @@ export default class Singers extends Vue {
     this.$router.push({
       path: `/singers/${singer.id}`,
     });
+    this.SET_SINGER(singer);
   }
 
   async created() {

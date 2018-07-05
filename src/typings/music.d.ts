@@ -1,5 +1,6 @@
 declare namespace Music {
   export interface State {
+    singer: Singer,
   }
 
   export interface Singer {
