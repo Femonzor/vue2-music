@@ -9,6 +9,17 @@ declare namespace Music {
     avatar: string,
   }
 
+  export interface Song {
+    id: string,
+    mid: string,
+    singer: string,
+    name: string,
+    album: string,
+    duration: number,
+    image: string,
+    url: string,
+  }
+
   export interface SingerGroup {
     title: string,
     items: Singer[],
