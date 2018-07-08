@@ -9,6 +9,7 @@ import { Component, Vue } from 'vue-property-decorator';
 import { Getter } from 'vuex-class';
 import api from '@/api/singer';
 import { ERR_OK } from '@/api/config';
+import { createSong } from '@/assets/js/song';
 
 @Component
 export default class Singer extends Vue {
@@ -21,17 +22,22 @@ export default class Singer extends Vue {
     }
     const response = await api.getSinger(this.singer.id);
     if (response.code === ERR_OK) {
-      console.log(response.data.list);
+      this.songs = this.normalizeSongs(response.data.list);
+      console.log(this.songs);
     } else {
       console.log(response);
     }
   }
 
-  normalizeSingers(list: Array<any>) {
-    let ret = [];
+  normalizeSongs(list: Array<any>) {
+    let ret: Array<Music.Song> = [];
     list.forEach(item => {
       let { musicData } = item;
+      if (musicData.songid && musicData.albummid) {
+        ret.push(createSong(musicData));
+      }
     });
+    return ret;
   }
 
   async created() {
