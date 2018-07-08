@@ -18,7 +18,7 @@ export default class Scroll extends Vue {
   @Prop({ default: true })
   private click!: true;
   @Prop({ default: () => [] })
-  private data!: Array<Object>;
+  private data!: Array<any>;
   @Prop({ default: false })
   private listenScroll!: boolean;
 

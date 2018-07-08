@@ -24,7 +24,7 @@ const HOT_SINGER_LENGTH = 10;
 })
 export default class Singers extends Vue {
   @Mutation private [SET_SINGER]!: (singer: Music.Singer) => void;
-  singers: Music.SingerGroup[] = [];
+  private singers: Music.SingerGroup[] = [];
 
   async getSingers() {
     const response = await singerApi.getSingers();

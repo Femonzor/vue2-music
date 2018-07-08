@@ -1,6 +1,6 @@
 <template>
   <transition name="slide">
-    <div class="singer-detail"></div>
+    <music-list :songs="songs" :title="title" :bg-image="bgImage"></music-list>
   </transition>
 </template>
 
@@ -10,11 +10,18 @@ import { Getter } from 'vuex-class';
 import api from '@/api/singer';
 import { ERR_OK } from '@/api/config';
 import { createSong } from '@/assets/js/song';
+import MusicList from '@/components/music-list/music-list.vue';
 
-@Component
+@Component({
+  components: {
+    MusicList,
+  },
+})
 export default class Singer extends Vue {
   @Getter private singer!: Music.Singer;
-  private songs!: Music.Song[];
+
+  private songs: Array<Music.Song> = [];
+
   async getSinger() {
     if (!this.singer.id) {
       this.$router.push('/singers');
@@ -23,7 +30,7 @@ export default class Singer extends Vue {
     const response = await api.getSinger(this.singer.id);
     if (response.code === ERR_OK) {
       this.songs = this.normalizeSongs(response.data.list);
-      console.log(this.songs);
+      // console.log(this.songs);
     } else {
       console.log(response);
     }
@@ -43,20 +50,19 @@ export default class Singer extends Vue {
   async created() {
     await this.getSinger();
   }
+
+  get title() {
+    return this.singer.name;
+  }
+  get bgImage() {
+    return this.singer.avatar;
+  }
 }
 </script>
 
 <style lang="stylus" scoped>
 @import '~@/assets/stylus/variable';
 
-.singer-detail
-  position: fixed
-  top: 0
-  left: 0
-  right: 0
-  bottom: 0
-  z-index: 100
-  background: $color-background
 .slide-enter-active,
 .slide-leave-active
   transition: all .3s
