@@ -1,6 +1,18 @@
 declare namespace Music {
+  export enum PlayMode {
+    Sequence,
+    Loop,
+    Random,
+  }
+
   export interface State {
     singer: Singer,
+    playing: boolean,
+    fullScreen: boolean,
+    playList: Array<any>,
+    sequenceList: Array<any>,
+    mode: PlayMode,
+    currentIndex: number,
   }
 
   export interface Singer {
