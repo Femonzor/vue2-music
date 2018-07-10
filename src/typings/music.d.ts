@@ -1,8 +1,8 @@
 declare namespace Music {
   export enum PlayMode {
-    Sequence,
-    Loop,
-    Random,
+    Sequence = 0,
+    Loop = 1,
+    Random = 2,
   }
 
   export interface State {

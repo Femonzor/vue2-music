@@ -8,7 +8,7 @@ const state: Music.State = {
   fullScreen: false,
   playList: [],
   sequenceList: [],
-  mode: Music.PlayMode.Sequence,
+  mode: 0,
   currentIndex: -1,
 };
 

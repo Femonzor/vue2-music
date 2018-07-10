@@ -1,7 +1,7 @@
 <template>
   <div class="song-list">
     <ul>
-      <li class="item" v-for="song in songs" :key="song.id">
+      <li @click="selectSong(song, index)" class="item" v-for="(song, index) in songs" :key="song.id">
         <div class="content">
           <h2 class="name">{{song.name}}</h2>
           <p class="desc">{{getDesc(song)}}</p>
@@ -21,6 +21,10 @@ export default class SongList extends Vue {
 
   getDesc(song: Music.Song) {
     return `${song.singer}·${song.album}`;
+  }
+
+  selectSong(song: Music.Song, index: number) {
+    this.$emit('select', song, index);
   }
 }
 </script>
@@ -45,12 +49,12 @@ export default class SongList extends Vue {
         width: 25px
         height: 24px
         background-size: 25px 24px
-        // &.icon0
-        //   bg-image('first')
-        // &.icon1
-        //   bg-image('second')
-        // &.icon2
-        //   bg-image('third')
+        &.icon0
+          bg-image('first')
+        &.icon1
+          bg-image('second')
+        &.icon2
+          bg-image('third')
       .text
         color: $color-theme
         font-size: $font-size-large

@@ -16,7 +16,7 @@
     <div class="bg-layer" ref="layer"></div>
     <scroll class="list" ref="list" :probe-type="probeType" :listen-scroll="listenScroll" @scroll="scroll">
       <div class="song-list-wrapper">
-        <song-list :songs="songs"></song-list>
+        <song-list @select="selectSong" :songs="songs"></song-list>
       </div>
       <div class="loading-container" v-show="!songs.length">
         <loading></loading>
@@ -31,6 +31,7 @@ import Scroll from '@/base/scroll/scroll.vue';
 import SongList from '@/base/song-list/song-list.vue';
 import Loading from '@/base/loading/loading.vue';
 import { prefixStyle } from '@/assets/js/dom';
+import { Action } from 'vuex-class';
 
 const RESERVED_HEIGHT = 40;
 const transform = prefixStyle('transform');
@@ -50,6 +51,8 @@ export default class MusicList extends Vue {
   private songs!: Array<Music.Song>;
   @Prop({ default: '' })
   private title!: string;
+
+  @Action selectPlay!: (obj: any) => void;
 
   private probeType: number = 3;
   private listenScroll: boolean = true;
@@ -73,6 +76,13 @@ export default class MusicList extends Vue {
 
   back() {
     this.$router.back();
+  }
+
+  selectSong(song: Music.Song, index: number) {
+    this.selectPlay({
+      list: this.songs,
+      index,
+    });
   }
 
   get bgStyle() {
