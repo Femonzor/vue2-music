@@ -1,4 +1,4 @@
-import { ActionTree } from "vuex";
+import { ActionTree } from 'vuex';
 import * as types from '@/store/types';
 
 const actions: ActionTree<any, any> = {
@@ -8,7 +8,7 @@ const actions: ActionTree<any, any> = {
     commit(types.SET_CURRENT_INDEX, index);
     commit(types.SET_FULL_SCREEN, true);
     commit(types.SET_PLAYING, true);
-  }
+  },
 };
 
 export default actions;

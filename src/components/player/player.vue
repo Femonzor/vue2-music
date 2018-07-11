@@ -1,58 +1,62 @@
 <template>
   <div class="player" v-show="playList.length">
-    <div class="normal-player" v-show="fullScreen">
-      <div class="background">
-        <img :src="currentSong.image" alt="" style="width:100%;height:100%;">
-      </div>
-      <div class="top">
-        <div class="back" @click="shrink">
-          <i class="icon-back"></i>
+    <transition name="normal" @enter="normalEnter" @after-enter="normalAfterEnter" @leave="normalLeave" @after-leave="normalAfterLeave">
+      <div class="normal-player" v-show="fullScreen">
+        <div class="background">
+          <img :src="currentSong.image" alt="" style="width:100%;height:100%;">
         </div>
-        <h1 class="title" v-html="currentSong.name"></h1>
-        <h2 class="subtitle" v-html="currentSong.singer"></h2>
-      </div>
-      <div class="middle">
-        <div class="middle-l">
-          <div class="cd-wrapper">
-            <div class="cd">
-              <img :src="currentSong.image" alt="" class="image">
+        <div class="top">
+          <div class="back" @click="shrink">
+            <i class="icon-back"></i>
+          </div>
+          <h1 class="title" v-html="currentSong.name"></h1>
+          <h2 class="subtitle" v-html="currentSong.singer"></h2>
+        </div>
+        <div class="middle">
+          <div class="middle-l">
+            <div class="cd-wrapper" ref="cdWrapper">
+              <div class="cd">
+                <img :src="currentSong.image" alt="" class="image">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bottom">
+          <div class="operators">
+            <div class="icon i-left">
+              <i class="icon-sequence"></i>
+            </div>
+            <div class="icon i-left">
+              <i class="icon-prev"></i>
+            </div>
+            <div class="icon i-center">
+              <i class="icon-play"></i>
+            </div>
+            <div class="icon i-right">
+              <i class="icon-next"></i>
+            </div>
+            <div class="icon i-right">
+              <i class="icon icon-not-favorite"></i>
             </div>
           </div>
         </div>
       </div>
-      <div class="bottom">
-        <div class="operators">
-          <div class="icon i-left">
-            <i class="icon-sequence"></i>
-          </div>
-          <div class="icon i-left">
-            <i class="icon-prev"></i>
-          </div>
-          <div class="icon i-center">
-            <i class="icon-play"></i>
-          </div>
-          <div class="icon i-right">
-            <i class="icon-next"></i>
-          </div>
-          <div class="icon i-right">
-            <i class="icon icon-not-favorite"></i>
-          </div>
+    </transition>
+    <transition name="mini">
+      <div class="mini-player" v-show="!fullScreen" @click="expand">
+        <div class="icon">
+          <img class="img" :src="currentSong.image" alt="">
+        </div>
+        <div class="text">
+          <h2 class="name" v-html="currentSong.name"></h2>
+          <p class="desc" v-html="currentSong.singer"></p>
+        </div>
+        <div class="control"></div>
+        <div class="control">
+          <i class="icon-playlist"></i>
         </div>
       </div>
-    </div>
-    <div class="mini-player" v-show="!fullScreen" @click="expand">
-      <div class="icon">
-        <img :src="currentSong.image" alt="" style="width:40px;height:40px;">
-      </div>
-      <div class="text">
-        <h2 class="name" v-html="currentSong.name"></h2>
-        <p class="desc" v-html="currentSong.singer"></p>
-      </div>
-      <div class="control"></div>
-      <div class="control">
-        <i class="icon-playlist"></i>
-      </div>
-    </div>
+    </transition>
   </div>
 </template>
 
@@ -60,6 +64,12 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { State, Getter, Mutation } from 'vuex-class';
 import { SET_FULL_SCREEN } from '@/store/types';
+import animations from 'create-keyframe-animation';
+import { prefixStyle } from '@/assets/js/dom';
+
+const transform = prefixStyle('transform');
+const transition = prefixStyle('transition');
+const animation = prefixStyle('animation');
 
 @Component
 export default class Player extends Vue {
@@ -68,11 +78,67 @@ export default class Player extends Vue {
   @Getter private currentSong!: Music.Song;
   @Mutation private [SET_FULL_SCREEN]!: (fullScreen: boolean) => void;
 
+  $refs: any = {
+    cdWrapper: HTMLElement
+  };
+
   shrink() {
     this.SET_FULL_SCREEN(false);
   }
   expand() {
     this.SET_FULL_SCREEN(true);
+  }
+  normalEnter(el: HTMLElement, done: Function) {
+    const { x, y, scale } = this.getPosAndScale();
+    const animation = {
+      0: {
+        transform: `translate3d(${x}px, ${y}px, 0) scale(${scale})`,
+      },
+      60: {
+        transform: `translate3d(0, 0, 0) scale(1.1)`,
+      },
+      100: {
+        transform: `translate3d(0, 0, 0) scale(1)`,
+      },
+    };
+    animations.registerAnimation({
+      name: 'move',
+      animation: animation,
+      presets: {
+        duration: 400,
+        easing: 'linear',
+      },
+    });
+    animations.runAnimation(this.$refs.cdWrapper, 'move', done);
+  }
+  normalAfterEnter() {
+    animations.unregisterAnimation('move');
+    this.$refs.cdWrapper.style[animation] = '';
+  }
+  normalLeave(el: HTMLElement, done: Function) {
+    this.$refs.cdWrapper.style[transition] = 'all 0.4s';
+    const { x, y, scale } = this.getPosAndScale();
+    this.$refs.cdWrapper.style[transform] = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
+    this.$refs.cdWrapper.addEventListener('transitionend', done);
+  }
+  normalAfterLeave() {
+    this.$refs.cdWrapper.style[transition] = '';
+    this.$refs.cdWrapper.style[transform] = '';
+  }
+  getPosAndScale() {
+    const targetWidth = 40;
+    const paddingLeft = 40;
+    const iconCenterToBottomDist = 30;
+    const cdTop = 80;
+    const cdWidth = window.innerWidth * 0.8;
+    const scale = targetWidth / cdWidth;
+    const x = -(window.innerWidth / 2 - paddingLeft);
+    const y = window.innerHeight - cdTop - cdWidth / 2 - iconCenterToBottomDist;
+    return {
+      x,
+      y,
+      scale,
+    };
   }
 }
 </script>
@@ -276,7 +342,10 @@ export default class Player extends Vue {
       flex: 0 0 40px
       width: 40px
       padding: 0 10px 0 20px
-      img
+      .img
+        width: 40px
+        height: 40px
+        display: block
         border-radius: 50%
         &.play
           animation: rotate 10s linear infinite
