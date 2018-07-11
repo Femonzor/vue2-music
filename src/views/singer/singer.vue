@@ -7,7 +7,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { State } from 'vuex-class';
-import api from '@/api/singer';
+import singerApi from '@/api/singer';
 import { ERR_OK } from '@/api/config';
 import { createSong } from '@/assets/js/song';
 import MusicList from '@/components/music-list/music-list.vue';
@@ -27,7 +27,7 @@ export default class Singer extends Vue {
       this.$router.push('/singers');
       return;
     }
-    const response = await api.getSinger(this.singer.id);
+    const response = await singerApi.getSinger(this.singer.id);
     if (response.code === ERR_OK) {
       this.songs = this.normalizeSongs(response.data.list);
       // console.log(this.songs);

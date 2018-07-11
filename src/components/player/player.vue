@@ -3,7 +3,7 @@
     <transition name="normal" @enter="normalEnter" @after-enter="normalAfterEnter" @leave="normalLeave" @after-leave="normalAfterLeave">
       <div class="normal-player" v-show="fullScreen">
         <div class="background">
-          <img :src="currentSong.image" alt="" style="width:100%;height:100%;">
+          <img class="img" :src="currentSong.image" alt="">
         </div>
         <div class="top">
           <div class="back" @click="shrink">
@@ -57,15 +57,18 @@
         </div>
       </div>
     </transition>
+    <audio :src="currentSong.url" ref="audio"></audio>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import { State, Getter, Mutation } from 'vuex-class';
-import { SET_FULL_SCREEN } from '@/store/types';
+import { SET_FULL_SCREEN, SET_CURRENT_SONG_URL } from '@/store/types';
 import animations from 'create-keyframe-animation';
 import { prefixStyle } from '@/assets/js/dom';
+import { ERR_OK } from '@/api/config';
+import songApi from '@/api/song';
 
 const transform = prefixStyle('transform');
 const transition = prefixStyle('transition');
@@ -77,9 +80,10 @@ export default class Player extends Vue {
   @State private playList!: Array<any>;
   @Getter private currentSong!: Music.Song;
   @Mutation private [SET_FULL_SCREEN]!: (fullScreen: boolean) => void;
+  @Mutation private [SET_CURRENT_SONG_URL]!: (url: string) => void;
 
   $refs: any = {
-    cdWrapper: HTMLElement
+    cdWrapper: HTMLElement,
   };
 
   shrink() {
@@ -140,6 +144,24 @@ export default class Player extends Vue {
       scale,
     };
   }
+
+  @Watch('currentSong')
+  async onCurrentSongChanged(song: Music.Song) {
+    const t = new Date().getUTCMilliseconds();
+    const guid = (Math.round(2147483647 * Math.random()) * t) % 1e10;
+    const vKeyData = await songApi.getSongVKey(guid, song.mid);
+    let vKey = '';
+    if (vKeyData.code == ERR_OK) {
+      vKey = vKeyData.data.items[0].vkey;
+    }
+    const url = `http://dl.stream.qqmusic.qq.com/C400${
+      song.mid
+    }.m4a?vkey=${vKey}&guid=${guid}&uin=0&fromtag=66`;
+    this.SET_CURRENT_SONG_URL(url);
+    this.$nextTick(() => {
+      this.$refs.audio.play();
+    });
+  }
 }
 </script>
 
@@ -165,6 +187,10 @@ export default class Player extends Vue {
       z-index: -1
       opacity: 0.6
       filter: blur(20px)
+      .img
+        width: 100%;
+        height: 100%;
+        display: block
     .top
       position: relative
       margin-bottom: 25px
