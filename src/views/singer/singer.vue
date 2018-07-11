@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { Getter } from 'vuex-class';
+import { State } from 'vuex-class';
 import api from '@/api/singer';
 import { ERR_OK } from '@/api/config';
 import { createSong } from '@/assets/js/song';
@@ -18,7 +18,7 @@ import MusicList from '@/components/music-list/music-list.vue';
   },
 })
 export default class Singer extends Vue {
-  @Getter private singer!: Music.Singer;
+  @State private singer!: Music.Singer;
 
   private songs: Array<Music.Song> = [];
 

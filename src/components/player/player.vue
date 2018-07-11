@@ -1,20 +1,79 @@
 <template>
   <div class="player" v-show="playList.length">
     <div class="normal-player" v-show="fullScreen">
-      播放器
+      <div class="background">
+        <img :src="currentSong.image" alt="" style="width:100%;height:100%;">
+      </div>
+      <div class="top">
+        <div class="back" @click="shrink">
+          <i class="icon-back"></i>
+        </div>
+        <h1 class="title" v-html="currentSong.name"></h1>
+        <h2 class="subtitle" v-html="currentSong.singer"></h2>
+      </div>
+      <div class="middle">
+        <div class="middle-l">
+          <div class="cd-wrapper">
+            <div class="cd">
+              <img :src="currentSong.image" alt="" class="image">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bottom">
+        <div class="operators">
+          <div class="icon i-left">
+            <i class="icon-sequence"></i>
+          </div>
+          <div class="icon i-left">
+            <i class="icon-prev"></i>
+          </div>
+          <div class="icon i-center">
+            <i class="icon-play"></i>
+          </div>
+          <div class="icon i-right">
+            <i class="icon-next"></i>
+          </div>
+          <div class="icon i-right">
+            <i class="icon icon-not-favorite"></i>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="mini-player" v-show="!fullScreen"></div>
+    <div class="mini-player" v-show="!fullScreen" @click="expand">
+      <div class="icon">
+        <img :src="currentSong.image" alt="" style="width:40px;height:40px;">
+      </div>
+      <div class="text">
+        <h2 class="name" v-html="currentSong.name"></h2>
+        <p class="desc" v-html="currentSong.singer"></p>
+      </div>
+      <div class="control"></div>
+      <div class="control">
+        <i class="icon-playlist"></i>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { Getter } from 'vuex-class';
+import { State, Getter, Mutation } from 'vuex-class';
+import { SET_FULL_SCREEN } from '@/store/types';
 
 @Component
 export default class Player extends Vue {
-  @Getter private fullScreen!: boolean;
-  @Getter private playList!: Array<any>;
+  @State private fullScreen!: boolean;
+  @State private playList!: Array<any>;
+  @Getter private currentSong!: Music.Song;
+  @Mutation private [SET_FULL_SCREEN]!: (fullScreen: boolean) => void;
+
+  shrink() {
+    this.SET_FULL_SCREEN(false);
+  }
+  expand() {
+    this.SET_FULL_SCREEN(true);
+  }
 }
 </script>
 
@@ -257,4 +316,3 @@ export default class Player extends Vue {
   100%
     transform: rotate(360deg)
 </style>
-
