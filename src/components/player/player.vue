@@ -15,25 +15,30 @@
         <div class="middle">
           <div class="middle-l">
             <div class="cd-wrapper" ref="cdWrapper">
-              <div class="cd">
+              <div class="cd" :class="cdState">
                 <img :src="currentSong.image" alt="" class="image">
               </div>
             </div>
           </div>
         </div>
         <div class="bottom">
+          <div class="progress-wrapper">
+            <span class="time time-l">{{formatTime(currentTime)}}</span>
+            <div class="progress-bar-wrapper"></div>
+            <span class="time time-r">{{formatTime(currentSong.duration)}}</span>
+          </div>
           <div class="operators">
             <div class="icon i-left">
               <i class="icon-sequence"></i>
             </div>
-            <div class="icon i-left">
-              <i class="icon-prev"></i>
+            <div class="icon i-left" :class="disableCls">
+              <i @click="prevSong" class="icon-prev"></i>
             </div>
-            <div class="icon i-center">
-              <i class="icon-play"></i>
+            <div class="icon i-center" :class="disableCls">
+              <i @click="togglePlaying" :class="playIcon"></i>
             </div>
-            <div class="icon i-right">
-              <i class="icon-next"></i>
+            <div class="icon i-right" :class="disableCls">
+              <i @click="nextSong" class="icon-next"></i>
             </div>
             <div class="icon i-right">
               <i class="icon icon-not-favorite"></i>
@@ -45,30 +50,38 @@
     <transition name="mini">
       <div class="mini-player" v-show="!fullScreen" @click="expand">
         <div class="icon">
-          <img class="img" :src="currentSong.image" alt="">
+          <img class="img" :class="cdState" :src="currentSong.image" alt="">
         </div>
         <div class="text">
           <h2 class="name" v-html="currentSong.name"></h2>
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
-        <div class="control"></div>
+        <div class="control">
+          <i @click.stop="togglePlaying" :class="miniIcon"></i>
+        </div>
         <div class="control">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
-    <audio :src="currentSong.url" ref="audio"></audio>
+    <audio :src="currentSong.url" ref="audio" @canplay="ready" @error="error" @timeupdate="updateTime"></audio>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator';
 import { State, Getter, Mutation } from 'vuex-class';
-import { SET_FULL_SCREEN, SET_CURRENT_SONG_URL } from '@/store/types';
+import {
+  SET_FULL_SCREEN,
+  SET_CURRENT_SONG_URL,
+  SET_PLAYING,
+  SET_CURRENT_INDEX,
+} from '@/store/types';
 import animations from 'create-keyframe-animation';
 import { prefixStyle } from '@/assets/js/dom';
 import { ERR_OK } from '@/api/config';
 import songApi from '@/api/song';
+import { format } from '@/assets/js/time';
 
 const transform = prefixStyle('transform');
 const transition = prefixStyle('transition');
@@ -78,9 +91,16 @@ const animation = prefixStyle('animation');
 export default class Player extends Vue {
   @State private fullScreen!: boolean;
   @State private playList!: Array<any>;
+  @State private playing!: boolean;
+  @State private currentIndex!: number;
   @Getter private currentSong!: Music.Song;
   @Mutation private [SET_FULL_SCREEN]!: (fullScreen: boolean) => void;
   @Mutation private [SET_CURRENT_SONG_URL]!: (url: string) => void;
+  @Mutation private [SET_PLAYING]!: (playing: boolean) => void;
+  @Mutation private [SET_CURRENT_INDEX]!: (currentIndex: number) => void;
+
+  private songReady: boolean = false;
+  private currentTime: number = 0;
 
   $refs: any = {
     cdWrapper: HTMLElement,
@@ -144,6 +164,46 @@ export default class Player extends Vue {
       scale,
     };
   }
+  togglePlaying() {
+    if (!this.songReady) return;
+    this.SET_PLAYING(!this.playing);
+  }
+  prevSong() {
+    if (!this.songReady) return;
+    let index = this.currentIndex - 1;
+    if (index === -1) {
+      index = this.playList.length - 1;
+    }
+    this.SET_CURRENT_INDEX(index);
+    if (!this.playing) {
+      this.togglePlaying();
+    }
+    this.songReady = false;
+  }
+  nextSong() {
+    if (!this.songReady) return;
+    let index = this.currentIndex + 1;
+    if (index === this.playList.length) {
+      index = 0;
+    }
+    this.SET_CURRENT_INDEX(index);
+    if (!this.playing) {
+      this.togglePlaying();
+    }
+    this.songReady = false;
+  }
+  ready() {
+    this.songReady = true;
+  }
+  error() {
+    this.songReady = true;
+  }
+  updateTime(event: any) {
+    this.currentTime = event.target.currentTime;
+  }
+  formatTime(time: number) {
+    return format(time);
+  }
 
   @Watch('currentSong')
   async onCurrentSongChanged(song: Music.Song) {
@@ -161,6 +221,27 @@ export default class Player extends Vue {
     this.$nextTick(() => {
       this.$refs.audio.play();
     });
+  }
+
+  @Watch('playing')
+  onPlayingChanged(playing: boolean) {
+    const audio = this.$refs.audio;
+    if (audio.networkState !== 0 && audio.networkState !== 3) {
+      playing ? audio.play() : audio.pause();
+    }
+  }
+
+  get playIcon() {
+    return this.playing ? 'icon-pause' : 'icon-play';
+  }
+  get miniIcon() {
+    return this.playing ? 'icon-pause-mini' : 'icon-play-mini';
+  }
+  get cdState() {
+    return this.playing ? 'play' : 'play pause';
+  }
+  get disableCls() {
+    return this.songReady ? '' : 'disable';
   }
 }
 </script>
