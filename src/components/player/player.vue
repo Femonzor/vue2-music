@@ -24,7 +24,9 @@
         <div class="bottom">
           <div class="progress-wrapper">
             <span class="time time-l">{{formatTime(currentTime)}}</span>
-            <div class="progress-bar-wrapper"></div>
+            <div class="progress-bar-wrapper">
+              <progress-bar :percent="percent"></progress-bar>
+            </div>
             <span class="time time-r">{{formatTime(currentSong.duration)}}</span>
           </div>
           <div class="operators">
@@ -82,12 +84,17 @@ import { prefixStyle } from '@/assets/js/dom';
 import { ERR_OK } from '@/api/config';
 import songApi from '@/api/song';
 import { format } from '@/assets/js/time';
+import ProgressBar from '@/base/progress-bar/progress-bar.vue';
 
 const transform = prefixStyle('transform');
 const transition = prefixStyle('transition');
 const animation = prefixStyle('animation');
 
-@Component
+@Component({
+  components: {
+    ProgressBar,
+  },
+})
 export default class Player extends Vue {
   @State private fullScreen!: boolean;
   @State private playList!: Array<any>;
@@ -242,6 +249,9 @@ export default class Player extends Vue {
   }
   get disableCls() {
     return this.songReady ? '' : 'disable';
+  }
+  get percent() {
+    return this.currentTime / this.currentSong.duration;
   }
 }
 </script>
