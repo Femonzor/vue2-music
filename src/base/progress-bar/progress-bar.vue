@@ -1,8 +1,8 @@
 <template>
-  <div class="progress-bar" ref="progressBar">
+  <div class="progress-bar" ref="progressBar" @click="progressClick">
     <div class="bar-inner">
       <div class="progress" ref="progress"></div>
-      <div class="progress-btn-wrapper" ref="progressBtn">
+      <div class="progress-btn-wrapper" ref="progressBtn" @touchstart.prevent="progressTouchStart" @touchmove.prevent="progressTouchMove" @touchend="progressTouchEnd">
         <div class="progress-btn"></div>
       </div>
     </div>
@@ -17,20 +17,57 @@ const progressBtnWidth: number = 16;
 const transform = prefixStyle('transform');
 
 @Component
-export default class ProgressBar extends Vue{
+export default class ProgressBar extends Vue {
   @Prop({ default: 0 })
-  percent!: number;
+  private percent!: number;
+
+  private touch: Music.ProgressTouch = {
+    initiated: false,
+    startX: 0,
+    left: 0,
+  };
 
   $refs: any = {};
 
   @Watch('percent')
   onPercentChanged(percent: number) {
-    if (percent > 0) {
+    if (percent >= 0 && !this.touch.initiated) {
       const barWidth = this.$refs.progressBar.clientWidth - progressBtnWidth;
       const offsetWidth = percent * barWidth;
-      this.$refs.progress.style.width = `${offsetWidth}px`;
-      this.$refs.progressBtn.style[transform] = `translate3d(${offsetWidth}px, 0, 0)`;
+      this.offset(offsetWidth);
     }
+  }
+
+  progressTouchStart(event: TouchEvent) {
+    this.touch.initiated = true;
+    this.touch.startX = event.touches[0].pageX;
+    this.touch.left = this.$refs.progress.clientWidth;
+  }
+  progressTouchMove(event: TouchEvent) {
+    if (!this.touch.initiated) return;
+    const deltaX = event.touches[0].pageX - this.touch.startX;
+    const offsetWidth = Math.min(
+      this.$refs.progressBar.clientWidth - progressBtnWidth,
+      Math.max(0, this.touch.left + deltaX),
+    );
+    this.offset(offsetWidth);
+  }
+  progressTouchEnd(event: TouchEvent) {
+    this.touch.initiated = false;
+    this.triggerPercent();
+  }
+  offset(offsetWidth: number) {
+    this.$refs.progress.style.width = `${offsetWidth}px`;
+    this.$refs.progressBtn.style[transform] = `translate3d(${offsetWidth}px, 0, 0)`;
+  }
+  triggerPercent() {
+    const barWidth = this.$refs.progressBar.clientWidth - progressBtnWidth;
+    const percent = this.$refs.progress.clientWidth / barWidth;
+    this.$emit('percentChange', percent);
+  }
+  progressClick(event: MouseEvent) {
+    this.offset(event.offsetX - progressBtnWidth / 2);
+    this.triggerPercent();
   }
 }
 </script>

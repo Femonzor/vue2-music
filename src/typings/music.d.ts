@@ -5,6 +5,12 @@ declare namespace Music {
     Random = 2,
   }
 
+  export interface ProgressTouch {
+    initiated: boolean,
+    startX: number,
+    left: number,
+  }
+
   export interface State {
     singer: Singer,
     playing: boolean,

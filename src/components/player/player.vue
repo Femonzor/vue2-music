@@ -25,7 +25,7 @@
           <div class="progress-wrapper">
             <span class="time time-l">{{formatTime(currentTime)}}</span>
             <div class="progress-bar-wrapper">
-              <progress-bar :percent="percent"></progress-bar>
+              <progress-bar :percent="percent" @percentChange="onProgressBarChange"></progress-bar>
             </div>
             <span class="time time-r">{{formatTime(currentSong.duration)}}</span>
           </div>
@@ -210,6 +210,10 @@ export default class Player extends Vue {
   }
   formatTime(time: number) {
     return format(time);
+  }
+  onProgressBarChange(percent: number) {
+    this.$refs.audio.currentTime = this.currentSong.duration * percent;
+    if (!this.playing) this.togglePlaying();
   }
 
   @Watch('currentSong')
