@@ -30,8 +30,8 @@
             <span class="time time-r">{{formatTime(currentSong.duration)}}</span>
           </div>
           <div class="operators">
-            <div class="icon i-left">
-              <i class="icon-sequence"></i>
+            <div class="icon i-left" @click="changeMode">
+              <i :class="iconMode"></i>
             </div>
             <div class="icon i-left" :class="disableCls">
               <i @click="prevSong" class="icon-prev"></i>
@@ -59,7 +59,9 @@
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
-          <i @click.stop="togglePlaying" :class="miniIcon"></i>
+          <progress-circle :radius="radius" :percent="percent">
+            <i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>
+          </progress-circle>
         </div>
         <div class="control">
           <i class="icon-playlist"></i>
@@ -78,6 +80,8 @@ import {
   SET_CURRENT_SONG_URL,
   SET_PLAYING,
   SET_CURRENT_INDEX,
+  SET_PLAY_MODE,
+  SET_PLAY_LIST,
 } from '@/store/types';
 import animations from 'create-keyframe-animation';
 import { prefixStyle } from '@/assets/js/dom';
@@ -85,6 +89,9 @@ import { ERR_OK } from '@/api/config';
 import songApi from '@/api/song';
 import { format } from '@/assets/js/time';
 import ProgressBar from '@/base/progress-bar/progress-bar.vue';
+import ProgressCircle from '@/base/progress-circle/progress-circle.vue';
+import { PlayMode } from '@/assets/js/config';
+import { shuffle } from '@/assets/js/util';
 
 const transform = prefixStyle('transform');
 const transition = prefixStyle('transition');
@@ -93,6 +100,7 @@ const animation = prefixStyle('animation');
 @Component({
   components: {
     ProgressBar,
+    ProgressCircle,
   },
 })
 export default class Player extends Vue {
@@ -100,14 +108,19 @@ export default class Player extends Vue {
   @State private playList!: Array<any>;
   @State private playing!: boolean;
   @State private currentIndex!: number;
+  @State private mode!: number;
+  @State private sequenceList!: Array<any>;
   @Getter private currentSong!: Music.Song;
   @Mutation private [SET_FULL_SCREEN]!: (fullScreen: boolean) => void;
   @Mutation private [SET_CURRENT_SONG_URL]!: (url: string) => void;
   @Mutation private [SET_PLAYING]!: (playing: boolean) => void;
   @Mutation private [SET_CURRENT_INDEX]!: (currentIndex: number) => void;
+  @Mutation private [SET_PLAY_MODE]!: (mode: PlayMode) => void;
+  @Mutation private [SET_PLAY_LIST]!: (playList: Array<any>) => void;
 
   private songReady: boolean = false;
   private currentTime: number = 0;
+  private radius: number = 32;
 
   $refs: any = {
     cdWrapper: HTMLElement,
@@ -215,9 +228,26 @@ export default class Player extends Vue {
     this.$refs.audio.currentTime = this.currentSong.duration * percent;
     if (!this.playing) this.togglePlaying();
   }
+  changeMode() {
+    const mode = (this.mode + 1) % 3;
+    this.SET_PLAY_MODE(mode);
+    let list = null;
+    if (mode === PlayMode.Random) {
+      list = shuffle(this.sequenceList);
+    } else {
+      list = this.sequenceList;
+    }
+    this.resetCurrentIndex(list);
+    this.SET_PLAY_LIST(list);
+  }
+  resetCurrentIndex(list: Array<any>) {
+    let index = list.findIndex((item: any) => item.id === this.currentSong.id);
+    this.SET_CURRENT_INDEX(index);
+  }
 
   @Watch('currentSong')
-  async onCurrentSongChanged(song: Music.Song) {
+  async onCurrentSongChanged(song: Music.Song, oldSong: Music.Song) {
+    if (song.id === oldSong.id) return;
     const t = new Date().getUTCMilliseconds();
     const guid = (Math.round(2147483647 * Math.random()) * t) % 1e10;
     const vKeyData = await songApi.getSongVKey(guid, song.mid);
@@ -256,6 +286,13 @@ export default class Player extends Vue {
   }
   get percent() {
     return this.currentTime / this.currentSong.duration;
+  }
+  get iconMode() {
+    return this.mode === PlayMode.Sequence
+      ? 'icon-sequence'
+      : this.mode === PlayMode.Loop
+        ? 'icon-loop'
+        : 'icon-random';
   }
 }
 </script>

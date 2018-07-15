@@ -17,7 +17,7 @@ const mutations: MutationTree<any> = {
   [types.SET_SEQUENCE_LIST](state: Music.State, sequenceList: Array<any>): void {
     state.sequenceList = sequenceList;
   },
-  [types.SET_PLAY_MODE](state: Music.State, mode: Music.PlayMode): void {
+  [types.SET_PLAY_MODE](state: Music.State, mode: PlayMode): void {
     state.mode = mode;
   },
   [types.SET_CURRENT_INDEX](state: Music.State, currentIndex: number): void {

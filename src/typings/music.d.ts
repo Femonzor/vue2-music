@@ -1,10 +1,8 @@
-declare namespace Music {
-  export enum PlayMode {
-    Sequence = 0,
-    Loop = 1,
-    Random = 2,
-  }
+// import { PlayMode } from '@/assets/js/config';
 
+declare enum PlayMode {}
+
+declare namespace Music {
   export interface ProgressTouch {
     initiated: boolean,
     startX: number,

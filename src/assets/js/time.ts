@@ -1,4 +1,4 @@
-import { pad } from '@/assets/js/tools';
+import { pad } from '@/assets/js/util';
 
 export const format = (interval: number): string => {
   interval |= 0;
