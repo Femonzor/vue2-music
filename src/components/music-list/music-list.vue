@@ -6,7 +6,7 @@
     <h1 class="title" v-html="title"></h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
       <div class="play-wrapper">
-        <div class="play" v-show="songs.length" ref="playBtn">
+        <div class="play" v-show="songs.length" ref="playBtn" @click="random">
           <i class="icon-play"></i>
           <span class="text">随机播放全部</span>
         </div>
@@ -53,6 +53,7 @@ export default class MusicList extends Vue {
   private title!: string;
 
   @Action selectPlay!: (obj: any) => void;
+  @Action randomPlay!: (obj: any) => void;
 
   private probeType: number = 3;
   private listenScroll: boolean = true;
@@ -73,15 +74,18 @@ export default class MusicList extends Vue {
   scroll(position: BScroll.Position) {
     this.scrollY = position.y;
   }
-
   back() {
     this.$router.back();
   }
-
   selectSong(song: Music.Song, index: number) {
     this.selectPlay({
       list: this.songs,
       index,
+    });
+  }
+  random() {
+    this.randomPlay({
+      list: this.songs
     });
   }
 

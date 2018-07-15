@@ -68,7 +68,7 @@
         </div>
       </div>
     </transition>
-    <audio :src="currentSong.url" ref="audio" @canplay="ready" @error="error" @timeupdate="updateTime"></audio>
+    <audio :src="currentSong.url" ref="audio" @canplay="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
   </div>
 </template>
 
@@ -187,6 +187,17 @@ export default class Player extends Vue {
   togglePlaying() {
     if (!this.songReady) return;
     this.SET_PLAYING(!this.playing);
+  }
+  end() {
+    if (this.mode === PlayMode.Loop) {
+      this.loop();
+    } else {
+      this.nextSong();
+    }
+  }
+  loop() {
+    this.$refs.audio.currentTime = 0;
+    this.$refs.audio.play();
   }
   prevSong() {
     if (!this.songReady) return;

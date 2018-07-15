@@ -66,7 +66,10 @@ export default class ProgressBar extends Vue {
     this.$emit('percentChange', percent);
   }
   progressClick(event: MouseEvent) {
-    this.offset(event.offsetX - progressBtnWidth / 2);
+    const rect = this.$refs.progressBar.getBoundingClientRect();
+    const offsetWidth = event.pageX - rect.left;
+    this.offset(offsetWidth - progressBtnWidth / 2);
+    // this.offset(event.offsetX - progressBtnWidth / 2);
     this.triggerPercent();
   }
 }

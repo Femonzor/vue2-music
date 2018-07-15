@@ -7,9 +7,10 @@ export const getRandomInt = (min: number, max: number): number => {
 };
 
 export const shuffle = (array: Array<any>): Array<any> => {
-  for (let i = 0, len = array.length; i < array.length; i++) {
+  let result = array.slice();
+  for (let i = 0, len = result.length; i < result.length; i++) {
     let j = getRandomInt(0, i);
-    array[i] = [array[j], (array[j] = array[i])][0];
+    result[i] = [result[j], (result[j] = result[i])][0];
   }
-  return array;
+  return result;
 };
