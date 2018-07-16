@@ -12,8 +12,8 @@
           <h1 class="title" v-html="currentSong.name"></h1>
           <h2 class="subtitle" v-html="currentSong.singer"></h2>
         </div>
-        <div class="middle">
-          <div class="middle-l">
+        <div class="middle" @touchstart.prevent="middleTouchStart" @touchmove.prevent="middleTouchMove" @touchend="middleTouchEnd">
+          <div class="middle-l" ref="middleL">
             <div class="cd-wrapper" ref="cdWrapper">
               <div class="cd" :class="cdState">
                 <img :src="currentSong.image" alt="" class="image">
@@ -23,12 +23,16 @@
           <scroll class="middle-r" ref="lyricList" :data="currentLyric && currentLyric.lines">
             <div class="lyric-wrapper">
               <div v-if="currentLyric">
-                <p ref="lyricLine" class="text" :class="{'current': currentLineNum === index}" v-for="(line, index) in currentLyric.lines">{{line.txt}}</p>
+                <p ref="lyricLine" class="text" :class="{'current': currentLineNum === index}" v-for="(line, index) in currentLyric.lines" :key="line.time">{{line.txt}}</p>
               </div>
             </div>
           </scroll>
         </div>
         <div class="bottom">
+          <div class="dot-wrapper">
+            <span class="dot" :class="{'active' : currentShow === 'cd'}"></span>
+            <span class="dot" :class="{'active' : currentShow === 'lyric'}"></span>
+          </div>
           <div class="progress-wrapper">
             <span class="time time-l">{{formatTime(currentTime)}}</span>
             <div class="progress-bar-wrapper">
@@ -105,6 +109,7 @@ import Scroll from '@/base/scroll/scroll.vue';
 
 const transform = prefixStyle('transform');
 const transition = prefixStyle('transition');
+const transitionDuration = prefixStyle('transitionDuration');
 const animation = prefixStyle('animation');
 
 @Component({
@@ -135,6 +140,8 @@ export default class Player extends Vue {
   private radius: number = 32;
   private currentLyric: any = null;
   private currentLineNum: number = 0;
+  private currentShow: string = 'cd';
+  private touch: any = {};
 
   $refs: any = {
     cdWrapper: HTMLElement,
@@ -287,6 +294,54 @@ export default class Player extends Vue {
       this.currentLyric.play();
     }
     console.log(this.currentLyric);
+  }
+  middleTouchStart(event: TouchEvent) {
+    this.touch.initiated = true;
+    const touch = event.touches[0];
+    this.touch.startX = touch.pageX;
+    this.touch.startY = touch.pageY;
+  }
+  middleTouchMove(event: TouchEvent) {
+    if (!this.touch.initiated) return;
+    const touch = event.touches[0];
+    const deltaX = touch.pageX - this.touch.startX;
+    const deltaY = touch.pageY - this.touch.startY;
+    if (Math.abs(deltaY) > Math.abs(deltaX)) return;
+    const left = this.currentShow === 'cd' ? 0 : -window.innerWidth;
+    const offsetWidth = Math.min(0, Math.max(-window.innerWidth, left + deltaX));
+    this.touch.percent = Math.abs(offsetWidth / window.innerWidth);
+    this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px, 0, 0)`;
+    this.$refs.lyricList.$el.style[transitionDuration] = 0;
+    this.$refs.middleL.style.opacity = 1 - this.touch.percent;
+    this.$refs.middleL.style[transitionDuration] = 0;
+  }
+  middleTouchEnd() {
+    let offsetWidth;
+    let opacity;
+    if (this.currentShow === 'cd') {
+      if (this.touch.percent > 0.1) {
+        offsetWidth = -window.innerWidth;
+        opacity = 0;
+        this.currentShow = 'lyric';
+      } else {
+        offsetWidth = 0;
+        opacity = 1;
+      }
+    } else {
+      if (this.touch.percent < 0.9) {
+        offsetWidth = 0;
+        opacity = 1;
+        this.currentShow = 'cd';
+      } else {
+        offsetWidth = -window.innerWidth;
+        opacity = 0;
+      }
+    }
+    const time = 300;
+    this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px, 0, 0)`;
+    this.$refs.lyricList.$el.style[transitionDuration] = `${time}ms`;
+    this.$refs.middleL.style.opacity = opacity;
+    this.$refs.middleL.style[transitionDuration] = `${time}ms`;
   }
 
   @Watch('currentSong')
