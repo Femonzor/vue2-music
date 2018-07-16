@@ -17,13 +17,13 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 @Component
 export default class SongList extends Vue {
   @Prop({ default: () => [] })
-  private songs!: Array<Music.Song>;
+  private songs!: Array<Song>;
 
-  getDesc(song: Music.Song) {
+  getDesc(song: Song) {
     return `${song.singer}·${song.album}`;
   }
 
-  selectSong(song: Music.Song, index: number) {
+  selectSong(song: Song, index: number) {
     this.$emit('select', song, index);
   }
 }

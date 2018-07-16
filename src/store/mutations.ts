@@ -26,6 +26,9 @@ const mutations: MutationTree<any> = {
   [types.SET_CURRENT_SONG_URL](state: Music.State, url: string): void {
     state.playList[state.currentIndex].url = url;
   },
+  [types.SET_CURRENT_SONG_LYRIC](state: Music.State, lyric: string): void {
+    state.playList[state.currentIndex].lyric = lyric;
+  },
 };
 
 export default mutations;

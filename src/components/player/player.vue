@@ -20,6 +20,13 @@
               </div>
             </div>
           </div>
+          <scroll class="middle-r" ref="lyricList" :data="currentLyric && currentLyric.lines">
+            <div class="lyric-wrapper">
+              <div v-if="currentLyric">
+                <p ref="lyricLine" class="text" :class="{'current': currentLineNum === index}" v-for="(line, index) in currentLyric.lines">{{line.txt}}</p>
+              </div>
+            </div>
+          </scroll>
         </div>
         <div class="bottom">
           <div class="progress-wrapper">
@@ -82,6 +89,7 @@ import {
   SET_CURRENT_INDEX,
   SET_PLAY_MODE,
   SET_PLAY_LIST,
+  SET_CURRENT_SONG_LYRIC,
 } from '@/store/types';
 import animations from 'create-keyframe-animation';
 import { prefixStyle } from '@/assets/js/dom';
@@ -92,6 +100,8 @@ import ProgressBar from '@/base/progress-bar/progress-bar.vue';
 import ProgressCircle from '@/base/progress-circle/progress-circle.vue';
 import { PlayMode } from '@/assets/js/config';
 import { shuffle } from '@/assets/js/util';
+import Lyric from 'lyric-parser';
+import Scroll from '@/base/scroll/scroll.vue';
 
 const transform = prefixStyle('transform');
 const transition = prefixStyle('transition');
@@ -101,6 +111,7 @@ const animation = prefixStyle('animation');
   components: {
     ProgressBar,
     ProgressCircle,
+    Scroll,
   },
 })
 export default class Player extends Vue {
@@ -110,17 +121,20 @@ export default class Player extends Vue {
   @State private currentIndex!: number;
   @State private mode!: number;
   @State private sequenceList!: Array<any>;
-  @Getter private currentSong!: Music.Song;
+  @Getter private currentSong!: Song;
   @Mutation private [SET_FULL_SCREEN]!: (fullScreen: boolean) => void;
   @Mutation private [SET_CURRENT_SONG_URL]!: (url: string) => void;
   @Mutation private [SET_PLAYING]!: (playing: boolean) => void;
   @Mutation private [SET_CURRENT_INDEX]!: (currentIndex: number) => void;
   @Mutation private [SET_PLAY_MODE]!: (mode: PlayMode) => void;
   @Mutation private [SET_PLAY_LIST]!: (playList: Array<any>) => void;
+  @Mutation private [SET_CURRENT_SONG_LYRIC]!: (lyric: string) => void;
 
   private songReady: boolean = false;
   private currentTime: number = 0;
   private radius: number = 32;
+  private currentLyric: any = null;
+  private currentLineNum: number = 0;
 
   $refs: any = {
     cdWrapper: HTMLElement,
@@ -255,9 +269,28 @@ export default class Player extends Vue {
     let index = list.findIndex((item: any) => item.id === this.currentSong.id);
     this.SET_CURRENT_INDEX(index);
   }
+  handleLyric(lineLyric: any) {
+    const { lineNum, txt } = lineLyric;
+    this.currentLineNum = lineNum;
+    if (lineNum > 5) {
+      const lineEl = this.$refs.lyricLine[lineNum - 5];
+      this.$refs.lyricList.scrollToElement(lineEl, 1000);
+    } else {
+      this.$refs.lyricList.scrollTo(0, 0, 1000);
+    }
+  }
+  async getLyric() {
+    const lyric = await this.currentSong.getLyric();
+    this.SET_CURRENT_SONG_LYRIC(lyric);
+    this.currentLyric = new Lyric(lyric, this.handleLyric);
+    if (this.playing) {
+      this.currentLyric.play();
+    }
+    console.log(this.currentLyric);
+  }
 
   @Watch('currentSong')
-  async onCurrentSongChanged(song: Music.Song, oldSong: Music.Song) {
+  async onCurrentSongChanged(song: Song, oldSong: Song) {
     if (song.id === oldSong.id) return;
     const t = new Date().getUTCMilliseconds();
     const guid = (Math.round(2147483647 * Math.random()) * t) % 1e10;
@@ -270,8 +303,9 @@ export default class Player extends Vue {
       song.mid
     }.m4a?vkey=${vKey}&guid=${guid}&uin=0&fromtag=66`;
     this.SET_CURRENT_SONG_URL(url);
-    this.$nextTick(() => {
+    this.$nextTick(async () => {
       this.$refs.audio.play();
+      await this.getLyric();
     });
   }
 

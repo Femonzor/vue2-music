@@ -20,7 +20,7 @@ import MusicList from '@/components/music-list/music-list.vue';
 export default class Singer extends Vue {
   @State private singer!: Music.Singer;
 
-  private songs: Array<Music.Song> = [];
+  private songs: Array<Song> = [];
 
   async getSinger() {
     if (!this.singer.id) {
@@ -37,7 +37,7 @@ export default class Singer extends Vue {
   }
 
   normalizeSongs(list: Array<any>) {
-    let ret: Array<Music.Song> = [];
+    let ret: Array<Song> = [];
     list.forEach(item => {
       let { musicData } = item;
       if (musicData.songid && musicData.albummid) {

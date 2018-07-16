@@ -1,3 +1,7 @@
+import songApi from '@/api/song';
+import { ERR_OK } from '@/api/config';
+import { Base64 } from 'js-base64';
+
 export default class Song {
   id: string;
   mid: string;
@@ -7,7 +11,8 @@ export default class Song {
   duration: number;
   image: string;
   url: string;
-  constructor(obj: Music.Song) {
+  lyric: string;
+  constructor(obj: any) {
     this.id = obj.id;
     this.mid = obj.mid;
     this.singer = obj.singer;
@@ -16,17 +21,19 @@ export default class Song {
     this.duration = obj.duration;
     this.image = obj.image;
     this.url = obj.url;
+    this.lyric = obj.lyric;
+  }
+
+  async getLyric() {
+    if (this.lyric) return this.lyric;
+    const response = await songApi.getLyric(this.mid);
+    if (response.retcode === ERR_OK) {
+      return Base64.decode(response.lyric);
+    }
   }
 }
 
 export const createSong = (musicData: any): Song => {
-  // const t = new Date().getUTCMilliseconds();
-  // const guid = (Math.round(2147483647 * Math.random()) * t) % 1e10;
-  // const vKeyData = await songApi.getSongVKey(guid, musicData.songmid);
-  // let vKey = '';
-  // if (vKeyData.code == ERR_OK) {
-  //   vKey = vKeyData.data.items[0].vkey;
-  // }
   return new Song({
     id: musicData.songid,
     mid: musicData.songmid,
@@ -37,10 +44,8 @@ export const createSong = (musicData: any): Song => {
     image: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${
       musicData.albummid
     }.jpg?max_age=2592000`,
-    // url: `http://dl.stream.qqmusic.qq.com/C400${
-    //   musicData.songmid
-    // }.m4a?vkey=${vKey}&guid=${guid}&uin=0&fromtag=66`,
     url: '',
+    lyric: '',
   });
 };
 

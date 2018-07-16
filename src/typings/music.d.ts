@@ -1,6 +1,18 @@
-// import { PlayMode } from '@/assets/js/config';
-
 declare enum PlayMode {}
+
+declare class Song {
+  id: string;
+  mid: string;
+  singer: string;
+  name: string;
+  album: string;
+  duration: number;
+  image: string;
+  url: string;
+  lyric: string;
+  constructor(obj: Song);
+  getLyric(): Promise<any>;
+}
 
 declare namespace Music {
   export interface ProgressTouch {
@@ -25,16 +37,16 @@ declare namespace Music {
     avatar: string,
   }
 
-  export interface Song {
-    id: string,
-    mid: string,
-    singer: string,
-    name: string,
-    album: string,
-    duration: number,
-    image: string,
-    url: string,
-  }
+  // export interface Song {
+  //   id: string,
+  //   mid: string,
+  //   singer: string,
+  //   name: string,
+  //   album: string,
+  //   duration: number,
+  //   image: string,
+  //   url: string,
+  // }
 
   export interface SingerGroup {
     title: string,

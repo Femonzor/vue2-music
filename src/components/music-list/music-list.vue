@@ -48,7 +48,7 @@ export default class MusicList extends Vue {
   @Prop({ default: '' })
   private bgImage!: string;
   @Prop({ default: () => [] })
-  private songs!: Array<Music.Song>;
+  private songs!: Array<Song>;
   @Prop({ default: '' })
   private title!: string;
 
@@ -77,7 +77,7 @@ export default class MusicList extends Vue {
   back() {
     this.$router.back();
   }
-  selectSong(song: Music.Song, index: number) {
+  selectSong(song: Song, index: number) {
     this.selectPlay({
       list: this.songs,
       index,
