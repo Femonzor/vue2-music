@@ -19,6 +19,9 @@
                 <img :src="currentSong.image" alt="" class="image">
               </div>
             </div>
+            <div class="playing-lyric-wrapper">
+              <div class="playing-lyric">{{playingLyric}}</div>
+            </div>
           </div>
           <scroll class="middle-r" ref="lyricList" :data="currentLyric && currentLyric.lines">
             <div class="lyric-wrapper">
@@ -106,6 +109,7 @@ import { PlayMode } from '@/assets/js/config';
 import { shuffle } from '@/assets/js/util';
 import Lyric from 'lyric-parser';
 import Scroll from '@/base/scroll/scroll.vue';
+import { setTimeout } from 'timers';
 
 const transform = prefixStyle('transform');
 const transition = prefixStyle('transition');
@@ -142,6 +146,7 @@ export default class Player extends Vue {
   private currentLineNum: number = 0;
   private currentShow: string = 'cd';
   private touch: any = {};
+  private playingLyric: string = '';
 
   $refs: any = {
     cdWrapper: HTMLElement,
@@ -208,6 +213,7 @@ export default class Player extends Vue {
   togglePlaying() {
     if (!this.songReady) return;
     this.SET_PLAYING(!this.playing);
+    if (this.currentLyric) this.currentLyric.togglePlay();
   }
   end() {
     if (this.mode === PlayMode.Loop) {
@@ -219,28 +225,37 @@ export default class Player extends Vue {
   loop() {
     this.$refs.audio.currentTime = 0;
     this.$refs.audio.play();
+    if (this.currentLyric) this.currentLyric.seek(0);
   }
   prevSong() {
     if (!this.songReady) return;
-    let index = this.currentIndex - 1;
-    if (index === -1) {
-      index = this.playList.length - 1;
-    }
-    this.SET_CURRENT_INDEX(index);
-    if (!this.playing) {
-      this.togglePlaying();
+    if (this.playList.length === 1) {
+      this.loop();
+    } else {
+      let index = this.currentIndex - 1;
+      if (index === -1) {
+        index = this.playList.length - 1;
+      }
+      this.SET_CURRENT_INDEX(index);
+      if (!this.playing) {
+        this.togglePlaying();
+      }
     }
     this.songReady = false;
   }
   nextSong() {
     if (!this.songReady) return;
-    let index = this.currentIndex + 1;
-    if (index === this.playList.length) {
-      index = 0;
-    }
-    this.SET_CURRENT_INDEX(index);
-    if (!this.playing) {
-      this.togglePlaying();
+    if (this.playList.length === 1) {
+      this.loop();
+    } else {
+      let index = this.currentIndex + 1;
+      if (index === this.playList.length) {
+        index = 0;
+      }
+      this.SET_CURRENT_INDEX(index);
+      if (!this.playing) {
+        this.togglePlaying();
+      }
     }
     this.songReady = false;
   }
@@ -257,8 +272,10 @@ export default class Player extends Vue {
     return format(time);
   }
   onProgressBarChange(percent: number) {
-    this.$refs.audio.currentTime = this.currentSong.duration * percent;
+    const currentTime = this.currentSong.duration * percent;
+    this.$refs.audio.currentTime = currentTime;
     if (!this.playing) this.togglePlaying();
+    if (this.currentLyric) this.currentLyric.seek(currentTime * 1000);
   }
   changeMode() {
     const mode = (this.mode + 1) % 3;
@@ -285,15 +302,21 @@ export default class Player extends Vue {
     } else {
       this.$refs.lyricList.scrollTo(0, 0, 1000);
     }
+    this.playingLyric = txt;
   }
   async getLyric() {
-    const lyric = await this.currentSong.getLyric();
-    this.SET_CURRENT_SONG_LYRIC(lyric);
-    this.currentLyric = new Lyric(lyric, this.handleLyric);
-    if (this.playing) {
-      this.currentLyric.play();
+    try {
+      const lyric = await this.currentSong.getLyric();
+      this.SET_CURRENT_SONG_LYRIC(lyric);
+      this.currentLyric = new Lyric(lyric, this.handleLyric);
+      if (this.playing) {
+        this.currentLyric.play();
+      }
+    } catch (error) {
+      this.currentLyric = null;
+      this.playingLyric = '';
+      this.currentLineNum = 0;
     }
-    console.log(this.currentLyric);
   }
   middleTouchStart(event: TouchEvent) {
     this.touch.initiated = true;
@@ -347,6 +370,7 @@ export default class Player extends Vue {
   @Watch('currentSong')
   async onCurrentSongChanged(song: Song, oldSong: Song) {
     if (song.id === oldSong.id) return;
+    if (this.currentLyric) this.currentLyric.stop();
     const t = new Date().getUTCMilliseconds();
     const guid = (Math.round(2147483647 * Math.random()) * t) % 1e10;
     const vKeyData = await songApi.getSongVKey(guid, song.mid);
@@ -358,10 +382,10 @@ export default class Player extends Vue {
       song.mid
     }.m4a?vkey=${vKey}&guid=${guid}&uin=0&fromtag=66`;
     this.SET_CURRENT_SONG_URL(url);
-    this.$nextTick(async () => {
+    setTimeout(async () => {
       this.$refs.audio.play();
       await this.getLyric();
-    });
+    }, 1000);
   }
 
   @Watch('playing')
