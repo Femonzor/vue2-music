@@ -100,8 +100,8 @@ export default class Recommends extends Vue {
 </script>
 
 <style lang="stylus" scoped>
-@import '~@/assets/stylus/variable';
-@import '~@/assets/stylus/mixin';
+@import "~@/assets/stylus/variable";
+@import "~@/assets/stylus/mixin";
 
 .recommends
   position: fixed

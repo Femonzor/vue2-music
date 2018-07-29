@@ -58,7 +58,7 @@ export default class Disc extends Vue {
 </script>
 
 <style lang="stylus" scoped>
-@import '~@/assets/stylus/variable';
+@import "~@/assets/stylus/variable";
 
 .slide-enter-active,
 .slide-leave-active
