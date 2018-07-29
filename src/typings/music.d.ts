@@ -29,6 +29,7 @@ declare namespace Music {
     sequenceList: Array<any>,
     mode: PlayMode,
     currentIndex: number,
+    disc: any,
   }
 
   export interface Singer {

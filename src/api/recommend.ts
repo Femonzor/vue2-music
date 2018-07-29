@@ -38,7 +38,35 @@ const getDiscsByTag = (): Promise<any> => {
     });
 };
 
+const getSongList = (dissId: string): Promise<any> => {
+  const url = '/api/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg';
+  const data = Object.assign({}, commonParams, {
+    disstid: dissId,
+    type: 1,
+    json: 1,
+    utf8: 1,
+    onlysong: 0,
+    platform: 'yqq',
+    hostUin: 0,
+    needNewCode: 0,
+    g_tk: 5381,
+    format: 'json',
+  });
+  return axios
+    .get(url, {
+      params: data,
+    })
+    .then(response => {
+      return Promise.resolve(response.data);
+    })
+    .catch(error => {
+      console.log(error);
+      return Promise.reject(error);
+    });
+};
+
 export default {
   getRecommends,
   getDiscsByTag,
+  getSongList,
 };

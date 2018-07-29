@@ -29,6 +29,9 @@ const mutations: MutationTree<any> = {
   [types.SET_CURRENT_SONG_LYRIC](state: Music.State, lyric: string): void {
     state.playList[state.currentIndex].lyric = lyric;
   },
+  [types.SET_DISC](state: Music.State, disc: any): void {
+    state.disc = disc;
+  },
 };
 
 export default mutations;

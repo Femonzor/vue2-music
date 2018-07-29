@@ -10,6 +10,7 @@ const state: Music.State = {
   sequenceList: [],
   mode: 0,
   currentIndex: -1,
+  disc: {},
 };
 
 export default state;

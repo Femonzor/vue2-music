@@ -14,7 +14,7 @@
         <div class="recommend-list">
           <h1 class="list-title">热门歌单推荐</h1>
           <ul>
-            <li v-for="disc in discs" :key="disc.dissid" class="item">
+            <li @click="selectItem(disc)" v-for="disc in discs" :key="disc.dissid" class="item">
               <div class="icon">
                 <img v-lazy="disc.imgurl" :alt="disc.dissname" style="width:60px;height:60px;">
               </div>
@@ -30,6 +30,7 @@
         <loading></loading>
       </div>
     </scroll>
+    <router-view></router-view>
   </div>
 </template>
 
@@ -41,6 +42,8 @@ import Loading from '@/base/loading/loading.vue';
 import recommendApi from '@/api/recommend';
 import { ERR_OK } from '@/api/config';
 import { playListMixin } from '@/assets/js/mixin';
+import { Mutation } from 'vuex-class';
+import { SET_DISC } from '@/store/types';
 
 @Component({
   components: {
@@ -51,8 +54,11 @@ import { playListMixin } from '@/assets/js/mixin';
   mixins: [playListMixin],
 })
 export default class Recommends extends Vue {
-  private recommends = [];
-  private discs = [];
+  @Mutation private [SET_DISC]!: (disc: any) => void;
+
+  private recommends: Array<any> = [];
+  private discs: Array<any> = [];
+  
 
   $refs!: {
     recommends: HTMLDivElement;
@@ -83,6 +89,12 @@ export default class Recommends extends Vue {
     const bottom = playList.length ? '60px' : '';
     this.$refs.recommends.style.bottom = bottom;
     this.$refs.scroll.refresh();
+  }
+  selectItem(disc: any) {
+    this.$router.push({
+      path: `/recommends/${disc.dissid}`,
+    });
+    this.SET_DISC(disc);
   }
 }
 </script>
