@@ -27,7 +27,14 @@ export default class ProgressBar extends Vue {
     left: 0,
   };
 
-  $refs: any = {};
+  $refs!: {
+    progressBar: HTMLDivElement;
+    progress: HTMLDivElement;
+    /**
+     * vscode warn with type cast, so use any instead of HTMLDivElement
+     */
+    progressBtn: HTMLDivElement;
+  };
 
   @Watch('percent')
   onPercentChanged(percent: number) {
@@ -58,7 +65,10 @@ export default class ProgressBar extends Vue {
   }
   offset(offsetWidth: number) {
     this.$refs.progress.style.width = `${offsetWidth}px`;
-    this.$refs.progressBtn.style[transform] = `translate3d(${offsetWidth}px, 0, 0)`;
+    /**
+     * vscode warn when using <> to cast type, so use as instead
+     */
+    (this.$refs.progressBtn.style as any)[transform] = `translate3d(${offsetWidth}px, 0, 0)`;
   }
   triggerPercent() {
     const barWidth = this.$refs.progressBar.clientWidth - progressBtnWidth;

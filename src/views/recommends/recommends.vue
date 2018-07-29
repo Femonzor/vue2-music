@@ -1,6 +1,6 @@
 <template>
-  <div class="recommends">
-    <scroll class="recommends-content">
+  <div class="recommends" ref="recommends">
+    <scroll class="recommends-content" ref="scroll">
       <div>
         <div v-if="recommends.length" class="slider-wrapper">
           <slider>
@@ -40,6 +40,7 @@ import Scroll from '@/base/scroll/scroll.vue';
 import Loading from '@/base/loading/loading.vue';
 import recommendApi from '@/api/recommend';
 import { ERR_OK } from '@/api/config';
+import { playListMixin } from '@/assets/js/mixin';
 
 @Component({
   components: {
@@ -47,10 +48,17 @@ import { ERR_OK } from '@/api/config';
     Scroll,
     Loading,
   },
+  mixins: [playListMixin],
 })
 export default class Recommends extends Vue {
   private recommends = [];
   private discs = [];
+
+  $refs!: {
+    recommends: HTMLDivElement;
+    scroll: Scroll;
+  };
+
   async getRecommends() {
     const response = await recommendApi.getRecommends();
     if (response.code === ERR_OK) {
@@ -59,7 +67,6 @@ export default class Recommends extends Vue {
       console.log(response);
     }
   }
-
   async getDiscsByTag() {
     const response = await recommendApi.getDiscsByTag();
     if (response.code === ERR_OK) {
@@ -68,10 +75,14 @@ export default class Recommends extends Vue {
       console.log(response);
     }
   }
-
   async created() {
     await this.getRecommends();
     await this.getDiscsByTag();
+  }
+  handlePlayList(playList: Array<any>) {
+    const bottom = playList.length ? '60px' : '';
+    this.$refs.recommends.style.bottom = bottom;
+    this.$refs.scroll.refresh();
   }
 }
 </script>

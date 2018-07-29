@@ -1,6 +1,6 @@
 <template>
-  <div class="singers">
-    <list-view @select="selectSinger" :data="singers"></list-view>
+  <div class="singers" ref="singers">
+    <list-view @select="selectSinger" :data="singers" ref="singerList"></list-view>
     <router-view></router-view>
   </div>
 </template>
@@ -13,6 +13,7 @@ import Singer from '@/assets/js/singer';
 import ListView from '@/base/listview/listview.vue';
 import { Mutation } from 'vuex-class';
 import { SET_SINGER } from '@/store/types';
+import { playListMixin } from '@/assets/js/mixin';
 
 const HOT_NAME = '热门';
 const HOT_SINGER_LENGTH = 10;
@@ -21,10 +22,16 @@ const HOT_SINGER_LENGTH = 10;
   components: {
     ListView,
   },
+  mixins: [playListMixin],
 })
 export default class Singers extends Vue {
   @Mutation private [SET_SINGER]!: (singer: Music.Singer) => void;
   private singers: Music.SingerGroup[] = [];
+
+  $refs!: {
+    singers: HTMLDivElement;
+    singerList: ListView;
+  };
 
   async getSingers() {
     const response = await singerApi.getSingers();
@@ -72,6 +79,11 @@ export default class Singers extends Vue {
       path: `/singers/${singer.id}`,
     });
     this.SET_SINGER(singer);
+  }
+  handlePlayList(playList: Array<any>) {
+    const bottom = playList.length ? '60px' : '';
+    this.$refs.singers.style.bottom = bottom;
+    this.$refs.singerList.refresh();
   }
 
   async created() {

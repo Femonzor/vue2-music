@@ -18,7 +18,7 @@ import { setTimeout, clearTimeout, clearInterval } from 'timers';
 @Component
 export default class Slider extends Vue {
   private slider!: BScroll;
-  private children!: Array<HTMLElement>;
+  private children!: HTMLCollection;
   private timer!: NodeJS.Timer;
   private dots: Array<number> = [];
   private currentPageIndex: number = 0;
@@ -30,9 +30,9 @@ export default class Slider extends Vue {
   @Prop({ default: 4000 })
   private interval!: number;
 
-  $refs: any = {
-    slider: HTMLElement,
-    sliderGroup: HTMLElement,
+  $refs!: {
+    slider: HTMLDivElement;
+    sliderGroup: HTMLDivElement;
   };
 
   mounted() {
@@ -62,7 +62,10 @@ export default class Slider extends Vue {
       sliderGroupWidth = 100 * childrenLength + '%';
     }
     for (let i = 0, len = this.children.length; i < len; i++) {
-      const child: HTMLElement = this.children[i];
+      /**
+       * vscode warn when using <> to cast type, so use as instead
+       */
+      const child: HTMLElement = this.children[i] as HTMLElement;
       addClass(child, 'slider-item');
       child.style.width = sliderWidth;
     }

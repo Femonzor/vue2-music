@@ -29,8 +29,8 @@ export default class Scroll extends Vue {
     }, 20);
   }
 
-  $refs: any = {
-    wrapper: HTMLElement,
+  $refs!: {
+    wrapper: HTMLDivElement;
   };
 
   mounted() {
@@ -61,10 +61,10 @@ export default class Scroll extends Vue {
   refresh() {
     this.scroll && this.scroll.refresh();
   }
-  scrollTo() {
+  scrollTo(x: number, y: number, time: number) {
     this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments);
   }
-  scrollToElement() {
+  scrollToElement(item: HTMLElement, time: number) {
     this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments);
   }
 }

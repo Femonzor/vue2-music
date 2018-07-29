@@ -148,8 +148,12 @@ export default class Player extends Vue {
   private touch: any = {};
   private playingLyric: string = '';
 
-  $refs: any = {
-    cdWrapper: HTMLElement,
+  $refs!: {
+    cdWrapper: HTMLDivElement;
+    audio: HTMLAudioElement;
+    lyricList: Scroll;
+    lyricLine: Array<HTMLParagraphElement>;
+    middleL: HTMLDivElement;
   };
 
   shrink() {
@@ -183,17 +187,19 @@ export default class Player extends Vue {
   }
   normalAfterEnter() {
     animations.unregisterAnimation('move');
-    this.$refs.cdWrapper.style[animation] = '';
+    (this.$refs.cdWrapper.style as any)[animation] = '';
   }
   normalLeave(el: HTMLElement, done: Function) {
-    this.$refs.cdWrapper.style[transition] = 'all 0.4s';
+    const cdWrapperStyle = this.$refs.cdWrapper.style as any;
+    cdWrapperStyle[transition] = 'all 0.4s';
     const { x, y, scale } = this.getPosAndScale();
-    this.$refs.cdWrapper.style[transform] = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
-    this.$refs.cdWrapper.addEventListener('transitionend', done);
+    cdWrapperStyle[transform] = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
+    this.$refs.cdWrapper.addEventListener('transitionend', done as any);
   }
   normalAfterLeave() {
-    this.$refs.cdWrapper.style[transition] = '';
-    this.$refs.cdWrapper.style[transform] = '';
+    const cdWrapperStyle = this.$refs.cdWrapper.style as any;
+    cdWrapperStyle[transition] = '';
+    cdWrapperStyle[transform] = '';
   }
   getPosAndScale() {
     const targetWidth = 40;
@@ -326,6 +332,8 @@ export default class Player extends Vue {
   }
   middleTouchMove(event: TouchEvent) {
     if (!this.touch.initiated) return;
+    const lyricListStyle = this.$refs.lyricList.$el.style as any;
+    const middleLStyle = this.$refs.middleL.style as any;
     const touch = event.touches[0];
     const deltaX = touch.pageX - this.touch.startX;
     const deltaY = touch.pageY - this.touch.startY;
@@ -333,10 +341,10 @@ export default class Player extends Vue {
     const left = this.currentShow === 'cd' ? 0 : -window.innerWidth;
     const offsetWidth = Math.min(0, Math.max(-window.innerWidth, left + deltaX));
     this.touch.percent = Math.abs(offsetWidth / window.innerWidth);
-    this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px, 0, 0)`;
-    this.$refs.lyricList.$el.style[transitionDuration] = 0;
-    this.$refs.middleL.style.opacity = 1 - this.touch.percent;
-    this.$refs.middleL.style[transitionDuration] = 0;
+    lyricListStyle[transform] = `translate3d(${offsetWidth}px, 0, 0)`;
+    lyricListStyle[transitionDuration] = 0;
+    middleLStyle.opacity = 1 - this.touch.percent + '';
+    middleLStyle[transitionDuration] = 0;
   }
   middleTouchEnd() {
     let offsetWidth;
@@ -361,10 +369,12 @@ export default class Player extends Vue {
       }
     }
     const time = 300;
-    this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px, 0, 0)`;
-    this.$refs.lyricList.$el.style[transitionDuration] = `${time}ms`;
-    this.$refs.middleL.style.opacity = opacity;
-    this.$refs.middleL.style[transitionDuration] = `${time}ms`;
+    const lyricListStyle = this.$refs.lyricList.$el.style as any;
+    const middleLStyle = this.$refs.middleL.style as any;
+    lyricListStyle[transform] = `translate3d(${offsetWidth}px, 0, 0)`;
+    lyricListStyle[transitionDuration] = `${time}ms`;
+    middleLStyle.opacity = opacity + '';
+    middleLStyle[transitionDuration] = `${time}ms`;
   }
 
   @Watch('currentSong')

@@ -26,12 +26,13 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
+import { Component, Prop, Watch, Vue } from 'vue-property-decorator';
 import Scroll from '@/base/scroll/scroll.vue';
 import SongList from '@/base/song-list/song-list.vue';
 import Loading from '@/base/loading/loading.vue';
 import { prefixStyle } from '@/assets/js/dom';
 import { Action } from 'vuex-class';
+import { playListMixin } from '@/assets/js/mixin';
 
 const RESERVED_HEIGHT = 40;
 const transform = prefixStyle('transform');
@@ -43,6 +44,7 @@ const backdrop = prefixStyle('backdrop-filter');
     SongList,
     Loading,
   },
+  mixins: [playListMixin],
 })
 export default class MusicList extends Vue {
   @Prop({ default: '' })
@@ -61,8 +63,12 @@ export default class MusicList extends Vue {
   private imageHeight: number = 0;
   private minTranslateY: number = 0;
 
-  $refs: any = {
-    list: Scroll,
+  $refs!: {
+    list: Scroll;
+    bgImage: HTMLImageElement;
+    filter: HTMLDivElement;
+    layer: HTMLDivElement;
+    playBtn: HTMLDivElement;
   };
 
   mounted() {
@@ -85,8 +91,13 @@ export default class MusicList extends Vue {
   }
   random() {
     this.randomPlay({
-      list: this.songs
+      list: this.songs,
     });
+  }
+  handlePlayList(playList: Array<any>) {
+    const bottom = playList.length ? '60px' : '';
+    this.$refs.list.$el.style.bottom = bottom;
+    this.$refs.list.refresh();
   }
 
   get bgStyle() {
@@ -99,7 +110,7 @@ export default class MusicList extends Vue {
     let zIndex = 0;
     let scale = 1;
     let blur = 0;
-    this.$refs.layer.style[transform] = `translate3d(0, ${translateY}px, 0)`;
+    (this.$refs.layer.style as any)[transform] = `translate3d(0, ${translateY}px, 0)`;
     const percent = Math.abs(newVal / this.imageHeight);
     if (newVal > 0) {
       scale = 1 + percent;
@@ -107,19 +118,19 @@ export default class MusicList extends Vue {
     } else {
       blur = Math.min(20 * percent, 20);
     }
-    this.$refs.filter.style[backdrop] = `blur(${blur})`;
+    (this.$refs.filter.style as any)[backdrop] = `blur(${blur})`;
     if (newVal < this.minTranslateY) {
       zIndex = 10;
-      this.$refs.bgImage.style.paddingTop = 0;
+      this.$refs.bgImage.style.paddingTop = '0';
       this.$refs.bgImage.style.height = `${RESERVED_HEIGHT}px`;
       this.$refs.playBtn.style.display = 'none';
     } else {
       this.$refs.bgImage.style.paddingTop = '70%';
-      this.$refs.bgImage.style.height = 0;
+      this.$refs.bgImage.style.height = '0';
       this.$refs.playBtn.style.display = '';
     }
-    this.$refs.bgImage.style.zIndex = zIndex;
-    this.$refs.bgImage.style[transform] = `scale(${scale})`;
+    this.$refs.bgImage.style.zIndex = zIndex + '';
+    (this.$refs.bgImage.style as any)[transform] = `scale(${scale})`;
   }
 }
 </script>

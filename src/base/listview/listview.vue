@@ -83,8 +83,11 @@ export default class ListView extends Vue {
     this.$refs.fixedTitle.style.transform = `translate3d(0, ${fixedTop}px, 0)`;
   }
 
-  $refs: any = {
-    listview: Scroll,
+  $refs!: {
+    shortcutList: HTMLUListElement;
+    fixedTitle: HTMLDivElement;
+    listview: Scroll;
+    listGroup: Array<HTMLLIElement>;
   };
 
   updated() {
@@ -148,6 +151,9 @@ export default class ListView extends Vue {
   }
   selectItem(item: Music.Singer) {
     this.$emit('select', item);
+  }
+  refresh() {
+    this.$refs.listview.refresh();
   }
 
   get shortcutList() {
