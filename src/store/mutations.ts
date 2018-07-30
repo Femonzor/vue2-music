@@ -32,6 +32,9 @@ const mutations: MutationTree<any> = {
   [types.SET_DISC](state: Music.State, disc: any): void {
     state.disc = disc;
   },
+  [types.SET_TOP_LIST](state: Music.State, topList: any): void {
+    state.topList = topList;
+  },
 };
 
 export default mutations;

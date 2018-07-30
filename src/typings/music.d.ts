@@ -30,6 +30,7 @@ declare namespace Music {
     mode: PlayMode,
     currentIndex: number,
     disc: any,
+    topList: any,
   }
 
   export interface Singer {

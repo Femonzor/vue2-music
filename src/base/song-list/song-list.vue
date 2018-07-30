@@ -2,6 +2,9 @@
   <div class="song-list">
     <ul>
       <li @click="selectSong(song, index)" class="item" v-for="(song, index) in songs" :key="song.id">
+        <div class="rank" v-show="rank">
+          <span :class="getRankClass(index)">{{getRankText(index)}}</span>
+        </div>
         <div class="content">
           <h2 class="name">{{song.name}}</h2>
           <p class="desc">{{getDesc(song)}}</p>
@@ -18,13 +21,24 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 export default class SongList extends Vue {
   @Prop({ default: () => [] })
   private songs!: Array<Song>;
+  @Prop({ default: false })
+  private rank!: boolean;
 
   getDesc(song: Song) {
     return `${song.singer}·${song.album}`;
   }
-
   selectSong(song: Song, index: number) {
     this.$emit('select', song, index);
+  }
+  getRankClass(index: number) {
+    if (index <= 2) {
+      return `icon icon${index}`;
+    } else {
+      return `text`;
+    }
+  }
+  getRankText(index: number) {
+    if (index > 2) return index + 1;
   }
 }
 </script>

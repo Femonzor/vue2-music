@@ -25,8 +25,8 @@ const HOT_SINGER_LENGTH = 10;
   mixins: [playListMixin],
 })
 export default class Singers extends Vue {
-  @Mutation
-  private [SET_SINGER]!: (singer: Music.Singer) => void;
+  @Mutation private [SET_SINGER]!: (singer: Music.Singer) => void;
+
   private singers: Music.SingerGroup[] = [];
 
   $refs!: {

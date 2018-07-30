@@ -16,7 +16,7 @@
     <div class="bg-layer" ref="layer"></div>
     <scroll class="list" ref="list" :probe-type="probeType" :listen-scroll="listenScroll" @scroll="scroll">
       <div class="song-list-wrapper">
-        <song-list @select="selectSong" :songs="songs"></song-list>
+        <song-list :rank="rank" @select="selectSong" :songs="songs"></song-list>
       </div>
       <div class="loading-container" v-show="!songs.length">
         <loading></loading>
@@ -53,6 +53,8 @@ export default class MusicList extends Vue {
   private songs!: Array<Song>;
   @Prop({ default: '' })
   private title!: string;
+  @Prop({ default: false })
+  private rank!: boolean;
 
   @Action selectPlay!: (obj: any) => void;
   @Action randomPlay!: (obj: any) => void;
@@ -101,7 +103,7 @@ export default class MusicList extends Vue {
   }
 
   get bgStyle() {
-    return `background:url(${this.bgImage})`;
+    return `background-image:url(${this.bgImage})`;
   }
 
   @Watch('scrollY')

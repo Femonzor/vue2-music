@@ -1,20 +1,23 @@
 <template>
-  <div class="rank">
-    <div class="toplist">
+  <div class="rank" ref="rank">
+    <scroll :data="topList" class="toplist" ref="scroll">
       <ul>
-        <li class="item">
+        <li class="item" v-for="item in topList" :key="item.id" @click="selectItem(item)">
           <div class="icon">
-            <img src="" alt="" class="img">
+            <img src="" alt="" class="img" v-lazy="item.picUrl">
           </div>
           <ul class="song-list">
-            <li class="song">
-              <span></span>
-              <span></span>
+            <li class="song" v-for="(song, index) in item.songList">
+              <span>{{index + 1}}</span>
+              <span>{{song.songname}}-{{song.singername}}</span>
             </li>
           </ul>
         </li>
       </ul>
-    </div>
+      <div class="loading-container" v-show="!topList.length">
+        <loading></loading>
+      </div>
+    </scroll>
     <router-view></router-view>
   </div>
 </template>
@@ -23,16 +26,47 @@
 import { Component, Vue } from 'vue-property-decorator';
 import rankApi from '@/api/rank';
 import { ERR_OK } from '@/api/config';
+import Scroll from '@/base/scroll/scroll.vue';
+import Loading from '@/base/loading/loading.vue';
+import { playListMixin } from '@/assets/js/mixin';
+import { Mutation } from 'vuex-class';
+import { SET_TOP_LIST } from '@/store/types';
 
-@Component
+@Component({
+  components: {
+    Scroll,
+    Loading,
+  },
+  mixins: [playListMixin],
+})
 export default class Rank extends Vue {
+  @Mutation private [SET_TOP_LIST]!: (topList: any) => void;
+
+  private topList: Array<any> = [];
+
+  $refs!: {
+    rank: HTMLDivElement;
+    scroll: Scroll;
+  };
+
   async getTopList() {
     const response = await rankApi.getTopList();
     if (response.code === ERR_OK) {
-      console.log(response.data.topList);
+      this.topList = response.data.topList;
     } else {
       console.log(response);
     }
+  }
+  handlePlayList(playList: Array<any>) {
+    const bottom = playList.length ? '60px' : '';
+    this.$refs.rank.style.bottom = bottom;
+    this.$refs.scroll.refresh();
+  }
+  selectItem(item: any) {
+    this.$router.push({
+      path: `/rank/${item.id}`,
+    });
+    this.SET_TOP_LIST(item);
   }
 
   async created() {

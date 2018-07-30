@@ -11,6 +11,7 @@ const state: Music.State = {
   mode: 0,
   currentIndex: -1,
   disc: {},
+  topList: {},
 };
 
 export default state;
