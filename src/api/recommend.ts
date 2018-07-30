@@ -49,7 +49,6 @@ const getSongList = (dissId: string): Promise<any> => {
     platform: 'yqq',
     hostUin: 0,
     needNewCode: 0,
-    g_tk: 5381,
     format: 'json',
   });
   return axios

@@ -1,4 +1,4 @@
-import { commonParams, options } from './config';
+import { commonParams } from './config';
 import axios from 'axios';
 
 const getSongVKey = (guid: number, songMid: string): Promise<any> => {
@@ -35,7 +35,6 @@ const getLyric = (songMid: string): Promise<any> => {
     platform: 'yqq',
     hostUin: 0,
     needNewCode: 0,
-    g_tk: 1840772130,
     format: 'json',
   });
   return axios
@@ -43,7 +42,7 @@ const getLyric = (songMid: string): Promise<any> => {
       params: data,
     })
     .then(response => {
-      // qq music cannot return jsonp string instead of json string, don't know y
+      // qq music cannot return json string but return jsonp string, don't know y
       let data = response.data;
       try {
         data = JSON.parse(data);

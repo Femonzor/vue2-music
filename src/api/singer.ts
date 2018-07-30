@@ -9,7 +9,6 @@ export const getSingers = (): Promise<any> => {
     key: 'all_all_all',
     pagesize: 100,
     pagenum: 1,
-    g_tk: 1664029744,
     hostUin: 0,
     platform: 'yqq',
     needNewCode: 0,
@@ -27,7 +26,6 @@ export const getSinger = (singerId: string): Promise<any> => {
     begin: 0,
     num: 100,
     songstatus: 1,
-    g_tk: 1840772130,
     singermid: singerId,
   });
   return jsonp(url, data, options);
