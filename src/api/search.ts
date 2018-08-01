@@ -11,7 +11,7 @@ const getHotKey = (): Promise<any> => {
   return jsonp(url, data, options);
 };
 
-const search = (query: string, page: number, zhida: boolean): Promise<any> => {
+const search = (query: string, page: number, zhida: boolean, perpage: number): Promise<any> => {
   const url = '/api/soso/fcgi-bin/search_for_qq_cp';
   const data = Object.assign({}, commonParams, {
     w: query,
@@ -23,8 +23,8 @@ const search = (query: string, page: number, zhida: boolean): Promise<any> => {
     ie: 'utf-8',
     sem: 1,
     aggr: 0,
-    perpage: 20,
-    n: 20,
+    perpage,
+    n: perpage,
     remoteplace: 'txt.mqq.all',
     needNewCode: 1,
     uin: 0,

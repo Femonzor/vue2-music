@@ -49,7 +49,7 @@ export const createSong = (musicData: any): Song => {
   });
 };
 
-export const filterSinger = (singers: Array<any>) => {
+const filterSinger = (singers: Array<any>) => {
   let ret: Array<string> = [];
   if (!singers) return '';
   singers.forEach(singer => {

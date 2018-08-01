@@ -1,7 +1,7 @@
 <template>
-  <div class="suggest">
+  <scroll class="suggest" :data="result" :pullup="pullup" @scrollToEnd="searchMore" ref="scroll">
     <ul class="suggest-list">
-      <li class="suggest-item" v-for="item in result" :key="(item.singermid || item.songmid) + item.type">
+      <li @click="selectItem(item)" class="suggest-item" v-for="item in result" :key="item.id">
         <div class="icon">
           <i :class="getIconClass(item)"></i>
         </div>
@@ -9,20 +9,34 @@
           <p class="text" v-html="getDisplayName(item)"></p>
         </div>
       </li>
+      <loading v-show="more" title=""></loading>
     </ul>
-  </div>
+  </scroll>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
 import searchApi from '@/api/search';
 import { ERR_OK } from '@/api/config';
-import { filterSinger } from '@/assets/js/song';
+import { createSong } from '@/assets/js/song';
+import Scroll from '@/base/scroll/scroll.vue';
+import Loading from '@/base/loading/loading.vue';
+import Singer from '@/assets/js/singer';
+import { Mutation } from 'vuex-class';
+import { SET_SINGER } from '@/store/types';
 
 const TYPE_SINGER = 'singer';
+const PER_PAGE = 50;
 
-@Component
+@Component({
+  components: {
+    Scroll,
+    Loading,
+  },
+})
 export default class Suggest extends Vue {
+  @Mutation private [SET_SINGER]!: (singer: Music.Singer) => void;
+
   @Prop({ default: '' })
   private query!: string;
   @Prop({ default: true })
@@ -30,6 +44,12 @@ export default class Suggest extends Vue {
 
   private page: number = 1;
   private result: Array<any> = [];
+  private pullup: boolean = true;
+  private more: boolean = true;
+
+  $refs!: {
+    scroll: Scroll;
+  };
 
   @Watch('query')
   async onQueryChanged() {
@@ -37,9 +57,25 @@ export default class Suggest extends Vue {
   }
 
   async search() {
-    const response = await searchApi.search(this.query, this.page, this.showSinger);
+    this.page = 1;
+    this.more = true;
+    const response = await searchApi.search(this.query, this.page, this.showSinger, PER_PAGE);
     if (response.code === ERR_OK) {
       this.result = this.normalizeResult(response.data);
+      this.$refs.scroll.scrollTo(0, 0, 0);
+      this.checkMore(response.data);
+    } else {
+      console.log(response);
+    }
+  }
+  async searchMore() {
+    if (!this.more) return;
+    const response = await searchApi.search(this.query, ++this.page, this.showSinger, PER_PAGE);
+    if (response.code === ERR_OK) {
+      this.result = this.result.concat(this.normalizeResult(response.data));
+      this.checkMore(response.data);
+    } else {
+      console.log(response);
     }
   }
   normalizeResult(data: any) {
@@ -53,9 +89,24 @@ export default class Suggest extends Vue {
       });
     }
     if (data.song) {
-      result = result.concat(data.song.list);
+      result = result.concat(this.normalizeSongs(data.song.list));
     }
     return result;
+  }
+  normalizeSongs(list: Array<any>) {
+    const result: Array<any> = [];
+    list.forEach(musicData => {
+      if (musicData.songid && musicData.albumid) {
+        result.push(createSong(musicData));
+      }
+    });
+    return result;
+  }
+  checkMore(data: any) {
+    const { song } = data;
+    if (!song.list.length || song.curnum + song.curpage * PER_PAGE > song.totalnum) {
+      this.more = false;
+    }
   }
   getIconClass(item: any) {
     if (item.type === TYPE_SINGER) {
@@ -68,7 +119,16 @@ export default class Suggest extends Vue {
     if (item.type === TYPE_SINGER) {
       return item.singername;
     } else {
-      return `${item.songname}-${filterSinger(item.singer)}`;
+      return `${item.name}-${item.singer}`;
+    }
+  }
+  selectItem(item: any) {
+    if (item.type === TYPE_SINGER) {
+      const singer = new Singer(item.singermid, item.singername);
+      this.$router.push({
+        path: `/search/${singer.id}`,
+      });
+      this.SET_SINGER(singer);
     }
   }
 }

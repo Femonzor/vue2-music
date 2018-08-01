@@ -21,6 +21,8 @@ export default class Scroll extends Vue {
   private data!: Array<any>;
   @Prop({ default: false })
   private listenScroll!: boolean;
+  @Prop({ default: false })
+  private pullup!: boolean;
 
   @Watch('data')
   onDataChanged() {
@@ -48,6 +50,13 @@ export default class Scroll extends Vue {
     if (this.listenScroll) {
       this.scroll.on('scroll', position => {
         this.$emit('scroll', position);
+      });
+    }
+    if (this.pullup) {
+      this.scroll.on('scrollEnd', () => {
+        if (this.scroll.y <= this.scroll.maxScrollY + 50) {
+          this.$emit('scrollToEnd');
+        }
       });
     }
   }
