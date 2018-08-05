@@ -1,5 +1,5 @@
 <template>
-  <scroll class="suggest" :data="result" :pullup="pullup" @scrollToEnd="searchMore" ref="scroll">
+  <scroll class="suggest" :data="result" :pullup="pullup" @scrollToEnd="searchMore" ref="scroll" :beforeScroll="beforeScroll" @beforeScroll="listScroll">
     <ul class="suggest-list">
       <li @click="selectItem(item)" class="suggest-item" v-for="item in result" :key="item.id">
         <div class="icon">
@@ -11,6 +11,9 @@
       </li>
       <loading v-show="more" title=""></loading>
     </ul>
+    <div v-show="!more && !result.length" class="no-result-wrapper">
+      <no-result title="抱歉，暂无搜索结果"></no-result>
+    </div>
   </scroll>
 </template>
 
@@ -21,8 +24,9 @@ import { ERR_OK } from '@/api/config';
 import { createSong } from '@/assets/js/song';
 import Scroll from '@/base/scroll/scroll.vue';
 import Loading from '@/base/loading/loading.vue';
+import NoResult from '@/base/no-result/no-result.vue';
 import Singer from '@/assets/js/singer';
-import { Mutation } from 'vuex-class';
+import { Mutation, Action } from 'vuex-class';
 import { SET_SINGER } from '@/store/types';
 
 const TYPE_SINGER = 'singer';
@@ -32,6 +36,7 @@ const PER_PAGE = 50;
   components: {
     Scroll,
     Loading,
+    NoResult,
   },
 })
 export default class Suggest extends Vue {
@@ -42,10 +47,13 @@ export default class Suggest extends Vue {
   @Prop({ default: true })
   private showSinger!: boolean;
 
+  @Action insertSong!: (obj: any) => void;
+
   private page: number = 1;
   private result: Array<any> = [];
   private pullup: boolean = true;
   private more: boolean = true;
+  private beforeScroll: boolean = true;
 
   $refs!: {
     scroll: Scroll;
@@ -102,6 +110,9 @@ export default class Suggest extends Vue {
     });
     return result;
   }
+  listScrol() {
+    this.$emit('listScroll');
+  }
   checkMore(data: any) {
     const { song } = data;
     if (!song.list.length || song.curnum + song.curpage * PER_PAGE > song.totalnum) {
@@ -129,6 +140,10 @@ export default class Suggest extends Vue {
         path: `/search/${singer.id}`,
       });
       this.SET_SINGER(singer);
+    } else {
+      this.insertSong({
+        song: item,
+      });
     }
   }
 }

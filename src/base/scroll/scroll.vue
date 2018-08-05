@@ -23,6 +23,8 @@ export default class Scroll extends Vue {
   private listenScroll!: boolean;
   @Prop({ default: false })
   private pullup!: boolean;
+  @Prop({ default: false })
+  beforeScroll!: boolean;
 
   @Watch('data')
   onDataChanged() {
@@ -57,6 +59,11 @@ export default class Scroll extends Vue {
         if (this.scroll.y <= this.scroll.maxScrollY + 50) {
           this.$emit('scrollToEnd');
         }
+      });
+    }
+    if (this.beforeScroll) {
+      this.scroll.on('beforeScrollStart', () => {
+        this.$emit('beforeScroll');
       });
     }
   }

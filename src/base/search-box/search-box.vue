@@ -1,13 +1,14 @@
 <template>
   <div class="search-box">
     <i class="icon-search"></i>
-    <input type="text" class="box" :placeholder="placeholder" v-model="query">
+    <input type="text" class="box" :placeholder="placeholder" v-model="query" ref="query">
     <i v-show="query" class="icon-dismiss" @click="clearInput"></i>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from 'vue-property-decorator';
+import { debounce } from '@/assets/js/util';
 
 @Component
 export default class SearchBox extends Vue {
@@ -16,16 +17,27 @@ export default class SearchBox extends Vue {
 
   private query: string = '';
 
+  $refs!: {
+    query: HTMLInputElement;
+  };
+
   clearInput() {
     this.query = '';
   }
   setQuery(query: string) {
     this.query = query;
   }
+  blur() {
+    this.$refs.query.blur();
+  }
 
-  @Watch('query')
-  onQueryChange(newQuery: string) {
-    this.$emit('query', newQuery);
+  created() {
+    this.$watch(
+      'query',
+      debounce((newQuery: string) => {
+        this.$emit('query', newQuery);
+      }, 200),
+    );
   }
 }
 </script>

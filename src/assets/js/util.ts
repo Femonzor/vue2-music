@@ -14,3 +14,13 @@ export const shuffle = (array: Array<any>): Array<any> => {
   }
   return result;
 };
+
+export const debounce = (func: Function, delay: number) => {
+  let timer: any;
+  return (...args: Array<any>) => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(global, args);
+    }, delay);
+  };
+};

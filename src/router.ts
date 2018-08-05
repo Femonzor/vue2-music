@@ -47,7 +47,6 @@ export default new Router({
       children: [
         {
           path: ':id',
-          name: 'singer',
           component: Singer,
         },
       ],
@@ -59,7 +58,6 @@ export default new Router({
       children: [
         {
           path: ':id',
-          name: 'singer',
           component: Singer,
         },
       ],
