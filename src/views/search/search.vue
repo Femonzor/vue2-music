@@ -13,10 +13,19 @@
             </li>
           </ul>
         </div>
+        <div class="search-history" v-show="searchHistory.length">
+          <h1 class="title">
+            <span class="text">搜索历史</span>
+            <span class="clear">
+              <i class="icon-clear"></i>
+            </span>
+          </h1>
+          <search-list :searches="searchHistory"></search-list>
+        </div>
       </div>
     </div>
     <div class="search-result" v-show="query">
-      <suggest :query="query" @listScroll="blurInput"></suggest>
+      <suggest @select="saveSearch" :query="query" @listScroll="blurInput"></suggest>
     </div>
     <router-view></router-view>
   </div>
@@ -28,14 +37,20 @@ import SearchBox from '@/base/search-box/search-box.vue';
 import searchApi from '@/api/search';
 import { ERR_OK } from '@/api/config';
 import Suggest from '@/components/suggest/suggest.vue';
+import { Action, State } from 'vuex-class';
+import SearchList from '@/base/search-list/search-list.vue';
 
 @Component({
   components: {
     SearchBox,
     Suggest,
+    SearchList,
   },
 })
 export default class Search extends Vue {
+  @State private searchHistory!: Array<any>;
+  @Action saveSearchHistory!: (query: string) => void;
+
   private hotkey: Array<any> = [];
   private query: string = '';
 
@@ -59,6 +74,9 @@ export default class Search extends Vue {
   }
   blurInput() {
     this.$refs.searchBox.blur();
+  }
+  saveSearch() {
+    this.saveSearchHistory(this.query);
   }
 
   async created() {

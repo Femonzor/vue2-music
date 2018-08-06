@@ -1,3 +1,5 @@
+import { loadSearch } from '@/assets/js/cache';
+
 const state: Music.State = {
   singer: {
     id: '',
@@ -12,6 +14,7 @@ const state: Music.State = {
   currentIndex: -1,
   disc: {},
   topList: {},
+  searchHistory: loadSearch(),
 };
 
 export default state;

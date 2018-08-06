@@ -110,7 +110,7 @@ export default class Suggest extends Vue {
     });
     return result;
   }
-  listScrol() {
+  listScroll() {
     this.$emit('listScroll');
   }
   checkMore(data: any) {
@@ -145,6 +145,7 @@ export default class Suggest extends Vue {
         song: item,
       });
     }
+    this.$emit('select');
   }
 }
 </script>

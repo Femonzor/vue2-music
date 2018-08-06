@@ -2,6 +2,7 @@ import { ActionTree } from 'vuex';
 import * as types from '@/store/types';
 import { PlayMode } from '@/assets/js/config';
 import { shuffle } from '@/assets/js/util';
+import { saveSearch } from '@/assets/js/cache';
 
 const findIndex = (list: Array<any>, song: any) => {
   return list.findIndex(item => {
@@ -64,6 +65,9 @@ const actions: ActionTree<any, any> = {
     commit(types.SET_CURRENT_INDEX, currentIndex);
     commit(types.SET_FULL_SCREEN, true);
     commit(types.SET_PLAYING, true);
+  },
+  saveSearchHistory({ commit }, query) {
+    commit(types.SET_SEARCH_HISTORY, saveSearch(query));
   },
 };
 

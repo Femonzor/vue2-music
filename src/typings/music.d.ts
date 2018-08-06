@@ -31,6 +31,7 @@ declare namespace Music {
     currentIndex: number,
     disc: any,
     topList: any,
+    searchHistory: Array<any>,
   }
 
   export interface Singer {
