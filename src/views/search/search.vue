@@ -1,61 +1,78 @@
 <template>
   <div class="search">
     <div class="search-box-wrapper">
-      <search-box ref="searchBox" @query="onQueryChange"></search-box>
+      <search-box ref="searchBox" @query="queryChange"></search-box>
     </div>
-    <div class="shortcut-wrapper" v-show="!query">
-      <div class="shortcut">
-        <div class="hot-key">
-          <h1 class="title">热门搜索</h1>
-          <ul>
-            <li @click="addQuery(item.k)" class="item" v-for="item in hotkey" :key="item.k">
-              <span>{{item.k}}</span>
-            </li>
-          </ul>
+    <div ref="shortcutWrapper" class="shortcut-wrapper" v-show="!query">
+      <scroll class="shortcut" :data="shortcut" ref="shortcut">
+        <div>
+          <div class="hot-key">
+            <h1 class="title">热门搜索</h1>
+            <ul>
+              <li @click="addQuery(item.k)" class="item" v-for="item in hotkey" :key="item.k">
+                <span>{{item.k}}</span>
+              </li>
+            </ul>
+          </div>
+          <div class="search-history" v-show="searchHistory.length">
+            <h1 class="title">
+              <span class="text">搜索历史</span>
+              <span class="clear" @click="clearConfirm">
+                <i class="icon-clear"></i>
+              </span>
+            </h1>
+            <search-list @select="addQuery" @delete="deleteSearch" :searches="searchHistory"></search-list>
+          </div>
         </div>
-        <div class="search-history" v-show="searchHistory.length">
-          <h1 class="title">
-            <span class="text">搜索历史</span>
-            <span class="clear">
-              <i class="icon-clear"></i>
-            </span>
-          </h1>
-          <search-list :searches="searchHistory"></search-list>
-        </div>
-      </div>
+      </scroll>
     </div>
-    <div class="search-result" v-show="query">
-      <suggest @select="saveSearch" :query="query" @listScroll="blurInput"></suggest>
+    <div ref="searchResult" class="search-result" v-show="query">
+      <suggest ref="suggest" @select="saveSearch" :query="query" @listScroll="blurInput"></suggest>
     </div>
+    <confirm ref="confirm" text="清空所有搜索历史？" @confirm="deleteAll"></confirm>
     <router-view></router-view>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Watch } from 'vue-property-decorator';
 import SearchBox from '@/base/search-box/search-box.vue';
 import searchApi from '@/api/search';
 import { ERR_OK } from '@/api/config';
 import Suggest from '@/components/suggest/suggest.vue';
 import { Action, State } from 'vuex-class';
 import SearchList from '@/base/search-list/search-list.vue';
+import Confirm from '@/base/confirm/confirm.vue';
+import Scroll from '@/base/scroll/scroll.vue';
+import { setTimeout } from 'timers';
+import { playListMixin } from '@/assets/js/mixin';
 
 @Component({
   components: {
     SearchBox,
     Suggest,
     SearchList,
+    Confirm,
+    Scroll,
   },
+  mixins: [playListMixin],
 })
 export default class Search extends Vue {
   @State private searchHistory!: Array<any>;
   @Action saveSearchHistory!: (query: string) => void;
+  @Action deleteSearchHistory!: (query: string) => void;
+  @Action clearSearchHistory!: () => void;
 
   private hotkey: Array<any> = [];
   private query: string = '';
 
   $refs!: {
     searchBox: SearchBox;
+    confirm: Confirm;
+    shortcut: Scroll;
+    shortcutWrapper: HTMLDivElement;
+    searchResult: HTMLDivElement;
+    suggest: Suggest;
   };
 
   async getHotKey() {
@@ -69,7 +86,7 @@ export default class Search extends Vue {
   addQuery(query: string) {
     this.$refs.searchBox.setQuery(query);
   }
-  onQueryChange(query: string) {
+  queryChange(query: string) {
     this.query = query;
   }
   blurInput() {
@@ -78,9 +95,38 @@ export default class Search extends Vue {
   saveSearch() {
     this.saveSearchHistory(this.query);
   }
+  deleteSearch(item: string) {
+    this.deleteSearchHistory(item);
+  }
+  deleteAll() {
+    this.clearSearchHistory();
+  }
+  clearConfirm() {
+    this.$refs.confirm.show();
+  }
+  handlePlayList(playList: Array<any>) {
+    const bottom = playList.length ? '60px' : '';
+    this.$refs.shortcutWrapper.style.bottom = bottom;
+    this.$refs.shortcut.refresh();
+    this.$refs.searchResult.style.bottom = bottom;
+    this.$refs.suggest.refresh();
+  }
 
   async created() {
     await this.getHotKey();
+  }
+
+  get shortcut() {
+    return this.hotkey.concat(this.searchHistory);
+  }
+
+  @Watch('query')
+  onQueryChange(newQuery: string) {
+    if (!newQuery) {
+      setTimeout(() => {
+        this.$refs.shortcut.refresh();
+      }, 20);
+    }
   }
 }
 </script>

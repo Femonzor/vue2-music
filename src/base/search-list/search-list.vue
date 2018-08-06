@@ -1,9 +1,9 @@
 <template>
   <div class="search-list" v-show="searches.length">
     <ul>
-      <li class="search-item" v-for="item in searches" :key="item">
+      <li @click="selectItem(item)" class="search-item" v-for="item in searches" :key="item">
         <span class="text">{{item}}</span>
-        <span class="icon">
+        <span class="icon" @click.stop="deleteItem(item)">
           <i class="icon-delete"></i>
         </span>
       </li>
@@ -18,6 +18,13 @@ import { Component, Vue, Prop } from 'vue-property-decorator';
 export default class SearchList extends Vue {
   @Prop({ default: () => [] })
   private searches!: Array<any>;
+
+  selectItem(item: string) {
+    this.$emit('select', item);
+  }
+  deleteItem(item: string) {
+    this.$emit('delete', item);
+  }
 }
 </script>
 

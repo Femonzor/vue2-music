@@ -147,6 +147,9 @@ export default class Suggest extends Vue {
     }
     this.$emit('select');
   }
+  refresh() {
+    this.$refs.scroll.refresh();
+  }
 }
 </script>
 

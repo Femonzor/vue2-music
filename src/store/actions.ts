@@ -2,7 +2,7 @@ import { ActionTree } from 'vuex';
 import * as types from '@/store/types';
 import { PlayMode } from '@/assets/js/config';
 import { shuffle } from '@/assets/js/util';
-import { saveSearch } from '@/assets/js/cache';
+import { saveSearch, deleteSearch, clearSearch } from '@/assets/js/cache';
 
 const findIndex = (list: Array<any>, song: any) => {
   return list.findIndex(item => {
@@ -68,6 +68,12 @@ const actions: ActionTree<any, any> = {
   },
   saveSearchHistory({ commit }, query) {
     commit(types.SET_SEARCH_HISTORY, saveSearch(query));
+  },
+  deleteSearchHistory({ commit }, query) {
+    commit(types.SET_SEARCH_HISTORY, deleteSearch(query));
+  },
+  clearSearchHistory({ commit }) {
+    commit(types.SET_SEARCH_HISTORY, clearSearch());
   },
 };
 
