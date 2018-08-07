@@ -77,11 +77,12 @@
             <i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>
           </progress-circle>
         </div>
-        <div class="control">
+        <div class="control" @click.stop="showPlayList">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
+    <play-list ref="playList"></play-list>
     <audio :src="currentSong.url" ref="audio" @canplay="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
   </div>
 </template>
@@ -110,6 +111,7 @@ import { shuffle } from '@/assets/js/util';
 import Lyric from 'lyric-parser';
 import Scroll from '@/base/scroll/scroll.vue';
 import { setTimeout } from 'timers';
+import PlayList from '@/components/play-list/play-list.vue';
 
 const transform = prefixStyle('transform');
 const transition = prefixStyle('transition');
@@ -121,6 +123,7 @@ const animation = prefixStyle('animation');
     ProgressBar,
     ProgressCircle,
     Scroll,
+    PlayList,
   },
 })
 export default class Player extends Vue {
@@ -154,6 +157,7 @@ export default class Player extends Vue {
     lyricList: Scroll;
     lyricLine: Array<HTMLParagraphElement>;
     middleL: HTMLDivElement;
+    playList: PlayList;
   };
 
   shrink() {
@@ -375,6 +379,9 @@ export default class Player extends Vue {
     lyricListStyle[transitionDuration] = `${time}ms`;
     middleLStyle.opacity = opacity + '';
     middleLStyle[transitionDuration] = `${time}ms`;
+  }
+  showPlayList() {
+    this.$refs.playList.show();
   }
 
   @Watch('currentSong')

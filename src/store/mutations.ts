@@ -1,5 +1,6 @@
 import * as types from '@/store/types';
 import { MutationTree } from 'vuex';
+import { PlayMode } from '@/assets/js/config';
 
 const mutations: MutationTree<any> = {
   [types.SET_SINGER](state: Music.State, singer: Music.Singer): void {

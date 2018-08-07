@@ -1,4 +1,5 @@
 import { loadSearch } from '@/assets/js/cache';
+import { PlayMode } from '@/assets/js/config';
 
 const state: Music.State = {
   singer: {
@@ -10,7 +11,7 @@ const state: Music.State = {
   fullScreen: false,
   playList: [],
   sequenceList: [],
-  mode: 0,
+  mode: PlayMode.Sequence,
   currentIndex: -1,
   disc: {},
   topList: {},

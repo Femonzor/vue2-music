@@ -10,7 +10,7 @@ const findIndex = (list: Array<any>, song: any) => {
   });
 };
 
-const actions: ActionTree<any, any> = {
+const actions: ActionTree<Music.State, any> = {
   selectPlay({ state, commit }, { list, index }) {
     commit(types.SET_SEQUENCE_LIST, list);
     if (state.mode === PlayMode.Random) {
@@ -65,6 +65,24 @@ const actions: ActionTree<any, any> = {
     commit(types.SET_CURRENT_INDEX, currentIndex);
     commit(types.SET_FULL_SCREEN, true);
     commit(types.SET_PLAYING, true);
+  },
+  deleteSong({ state, commit }, song) {
+    let playList = state.playList.slice();
+    let sequenceList = state.sequenceList.slice();
+    let currentIndex = state.currentIndex;
+    let pIndex = findIndex(playList, song);
+    playList.splice(pIndex, 1);
+    let sIndex = findIndex(sequenceList, song);
+    sequenceList.splice(sIndex, 1);
+    if (currentIndex > pIndex || currentIndex === playList.length) {
+      currentIndex--;
+    }
+    commit(types.SET_PLAY_LIST, playList);
+    commit(types.SET_SEQUENCE_LIST, sequenceList);
+    commit(types.SET_CURRENT_INDEX, currentIndex);
+    if (!playList.length) {
+      commit(types.SET_PLAYING, false);
+    }
   },
   saveSearchHistory({ commit }, query) {
     commit(types.SET_SEARCH_HISTORY, saveSearch(query));

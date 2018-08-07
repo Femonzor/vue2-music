@@ -1,5 +1,3 @@
-declare enum PlayMode {}
-
 declare class Song {
   id: string;
   mid: string;
@@ -27,7 +25,7 @@ declare namespace Music {
     fullScreen: boolean,
     playList: Array<any>,
     sequenceList: Array<any>,
-    mode: PlayMode,
+    mode: number,
     currentIndex: number,
     disc: any,
     topList: any,
@@ -39,17 +37,6 @@ declare namespace Music {
     name: string,
     avatar: string,
   }
-
-  // export interface Song {
-  //   id: string,
-  //   mid: string,
-  //   singer: string,
-  //   name: string,
-  //   album: string,
-  //   duration: number,
-  //   image: string,
-  //   url: string,
-  // }
 
   export interface SingerGroup {
     title: string,
