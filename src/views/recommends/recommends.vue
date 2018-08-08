@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Mixins } from 'vue-property-decorator';
 import Slider from '@/base/slider/slider.vue';
 import Scroll from '@/base/scroll/scroll.vue';
 import Loading from '@/base/loading/loading.vue';
@@ -51,9 +51,8 @@ import { SET_DISC } from '@/store/types';
     Scroll,
     Loading,
   },
-  mixins: [playListMixin],
 })
-export default class Recommends extends Vue {
+export default class Recommends extends Mixins(playListMixin) {
   @Mutation private [SET_DISC]!: (disc: any) => void;
 
   private recommends: Array<any> = [];

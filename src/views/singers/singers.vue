@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Mixins } from 'vue-property-decorator';
 import singerApi from '@/api/singer';
 import { ERR_OK } from '@/api/config';
 import Singer from '@/assets/js/singer';
@@ -22,9 +22,8 @@ const HOT_SINGER_LENGTH = 10;
   components: {
     ListView,
   },
-  mixins: [playListMixin],
 })
-export default class Singers extends Vue {
+export default class Singers extends Mixins(playListMixin) {
   @Mutation private [SET_SINGER]!: (singer: Music.Singer) => void;
 
   private singers: Music.SingerGroup[] = [];

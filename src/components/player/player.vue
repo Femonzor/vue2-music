@@ -88,15 +88,12 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Component, Vue, Watch, Mixins } from 'vue-property-decorator';
 import { State, Getter, Mutation } from 'vuex-class';
 import {
   SET_FULL_SCREEN,
   SET_CURRENT_SONG_URL,
   SET_PLAYING,
-  SET_CURRENT_INDEX,
-  SET_PLAY_MODE,
-  SET_PLAY_LIST,
   SET_CURRENT_SONG_LYRIC,
 } from '@/store/types';
 import animations from 'create-keyframe-animation';
@@ -112,6 +109,7 @@ import Lyric from 'lyric-parser';
 import Scroll from '@/base/scroll/scroll.vue';
 import { setTimeout } from 'timers';
 import PlayList from '@/components/play-list/play-list.vue';
+import { playerMixin } from '@/assets/js/mixin';
 
 const transform = prefixStyle('transform');
 const transition = prefixStyle('transition');
@@ -126,20 +124,14 @@ const animation = prefixStyle('animation');
     PlayList,
   },
 })
-export default class Player extends Vue {
+export default class Player extends Mixins(playerMixin) {
   @State private fullScreen!: boolean;
   @State private playList!: Array<any>;
   @State private playing!: boolean;
   @State private currentIndex!: number;
-  @State private mode!: number;
-  @State private sequenceList!: Array<any>;
-  @Getter private currentSong!: Song;
   @Mutation private [SET_FULL_SCREEN]!: (fullScreen: boolean) => void;
   @Mutation private [SET_CURRENT_SONG_URL]!: (url: string) => void;
   @Mutation private [SET_PLAYING]!: (playing: boolean) => void;
-  @Mutation private [SET_CURRENT_INDEX]!: (currentIndex: number) => void;
-  @Mutation private [SET_PLAY_MODE]!: (mode: PlayMode) => void;
-  @Mutation private [SET_PLAY_LIST]!: (playList: Array<any>) => void;
   @Mutation private [SET_CURRENT_SONG_LYRIC]!: (lyric: string) => void;
 
   private songReady: boolean = false;
@@ -287,22 +279,6 @@ export default class Player extends Vue {
     if (!this.playing) this.togglePlaying();
     if (this.currentLyric) this.currentLyric.seek(currentTime * 1000);
   }
-  changeMode() {
-    const mode = (this.mode + 1) % 3;
-    this.SET_PLAY_MODE(mode);
-    let list = null;
-    if (mode === PlayMode.Random) {
-      list = shuffle(this.sequenceList);
-    } else {
-      list = this.sequenceList;
-    }
-    this.resetCurrentIndex(list);
-    this.SET_PLAY_LIST(list);
-  }
-  resetCurrentIndex(list: Array<any>) {
-    let index = list.findIndex((item: any) => item.id === this.currentSong.id);
-    this.SET_CURRENT_INDEX(index);
-  }
   handleLyric(lineLyric: any) {
     const { lineNum, txt } = lineLyric;
     this.currentLineNum = lineNum;
@@ -385,7 +361,8 @@ export default class Player extends Vue {
   }
 
   @Watch('currentSong')
-  async onCurrentSongChanged(song: Song, oldSong: Song) {
+  async onCurrentSongChange(song: Song, oldSong: Song) {
+    if (!song.id) return;
     if (song.id === oldSong.id) return;
     if (this.currentLyric) this.currentLyric.stop();
     const t = new Date().getUTCMilliseconds();
@@ -406,7 +383,7 @@ export default class Player extends Vue {
   }
 
   @Watch('playing')
-  onPlayingChanged(playing: boolean) {
+  onPlayingChange(playing: boolean) {
     const audio = this.$refs.audio;
     if (audio.networkState !== 0 && audio.networkState !== 3) {
       playing ? audio.play() : audio.pause();
@@ -427,13 +404,6 @@ export default class Player extends Vue {
   }
   get percent() {
     return this.currentTime / this.currentSong.duration;
-  }
-  get iconMode() {
-    return this.mode === PlayMode.Sequence
-      ? 'icon-sequence'
-      : this.mode === PlayMode.Loop
-        ? 'icon-loop'
-        : 'icon-random';
   }
 }
 </script>

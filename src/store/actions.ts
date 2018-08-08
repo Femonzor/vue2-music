@@ -80,9 +80,14 @@ const actions: ActionTree<Music.State, any> = {
     commit(types.SET_PLAY_LIST, playList);
     commit(types.SET_SEQUENCE_LIST, sequenceList);
     commit(types.SET_CURRENT_INDEX, currentIndex);
-    if (!playList.length) {
-      commit(types.SET_PLAYING, false);
-    }
+    const playing = playList.length > 0;
+    commit(types.SET_PLAYING, playing);
+  },
+  deleteSongList({ commit }) {
+    commit(types.SET_PLAY_LIST, []);
+    commit(types.SET_SEQUENCE_LIST, []);
+    commit(types.SET_CURRENT_INDEX, -1);
+    commit(types.SET_PLAYING, false);
   },
   saveSearchHistory({ commit }, query) {
     commit(types.SET_SEARCH_HISTORY, saveSearch(query));

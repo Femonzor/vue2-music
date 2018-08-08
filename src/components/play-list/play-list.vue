@@ -4,24 +4,24 @@
       <div class="list-wrapper" @click.stop>
         <div class="list-header">
           <h1 class="title">
-            <i class="icon"></i>
-            <span class="text"></span>
-            <span class="clear"><i class="icon-clear"></i></span>
+            <i class="icon" :class="iconMode" @click="changeMode"></i>
+            <span class="text">{{modeText}}</span>
+            <span class="clear" @click="showConfirm"><i class="icon-clear"></i></span>
           </h1>
         </div>
         <scroll ref="scroll" :data="sequenceList" class="list-content">
-          <ul>
+          <transition-group name="list" tag="ul">
             <li class="item" v-for="(item, index) in sequenceList" :key="item.id" @click="selectItem(item, index)" ref="listItem">
               <i class="current" :class="getCurrentIcon(item)"></i>
               <span class="text">{{item.name}}</span>
               <span class="like">
                 <i class="icon-not-favorite"></i>
               </span>
-              <span class="delete" @click="deleteSong(item)">
+              <span class="delete" @click.stop="deleteItem(item)">
                 <i class="icon-delete"></i>
               </span>
             </li>
-          </ul>
+          </transition-group>
         </scroll>
         <div class="list-operate">
           <div class="add">
@@ -33,36 +33,39 @@
           <span>关闭</span>
         </div>
       </div>
+      <confirm @confirm="confirmClear" ref="confirm" text="是否清空播放列表?"></confirm>
     </div>
   </transition>
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
-import { State, Getter, Mutation } from 'vuex-class';
+import { Component, Vue, Watch, Mixins } from 'vue-property-decorator';
+import { State, Getter, Mutation, Action } from 'vuex-class';
 import { SET_CURRENT_INDEX, SET_PLAYING } from '@/store/types';
 import Scroll from '@/base/scroll/scroll.vue';
 import { setTimeout } from 'timers';
 import { PlayMode } from '@/assets/js/config';
+import Confirm from '@/base/confirm/confirm.vue';
+import { playerMixin } from '@/assets/js/mixin';
 
 @Component({
   components: {
     Scroll,
+    Confirm,
   },
 })
-export default class PlayList extends Vue {
-  @State private sequenceList!: Array<any>;
-  @State private mode!: number;
+export default class PlayList extends Mixins(playerMixin) {
   @State private playList!: Array<any>;
-  @Getter private currentSong!: Song;
-  @Mutation private [SET_CURRENT_INDEX]!: (currentIndex: number) => void;
   @Mutation private [SET_PLAYING]!: (playing: boolean) => void;
+  @Action deleteSong!: (song: Song) => void;
+  @Action deleteSongList!: () => void;
 
   private showFlag: boolean = false;
 
   $refs!: {
     scroll: Scroll;
     listItem: Array<HTMLLIElement>;
+    confirm: Confirm;
   };
 
   show() {
@@ -94,7 +97,27 @@ export default class PlayList extends Vue {
     });
     this.$refs.scroll.scrollToElement(this.$refs.listItem[index], 300);
   }
-  deleteSong(item: Song) {}
+  deleteItem(item: any) {
+    this.deleteSong(item);
+    if (!this.playList.length) {
+      this.hide();
+    }
+  }
+  showConfirm() {
+    this.$refs.confirm.show();
+  }
+  confirmClear() {
+    this.deleteSongList();
+    this.hide();
+  }
+
+  get modeText() {
+    return this.mode === PlayMode.Sequence
+      ? '顺序播放'
+      : this.mode === PlayMode.Random
+        ? '随机播放'
+        : '单曲循环';
+  }
 
   @Watch('currentSong')
   onCurrentSongChange(newSong: Song, oldSong: Song) {

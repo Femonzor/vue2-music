@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Vue, Mixins } from 'vue-property-decorator';
 import rankApi from '@/api/rank';
 import { ERR_OK } from '@/api/config';
 import Scroll from '@/base/scroll/scroll.vue';
@@ -37,9 +37,8 @@ import { SET_TOP_LIST } from '@/store/types';
     Scroll,
     Loading,
   },
-  mixins: [playListMixin],
 })
-export default class Rank extends Vue {
+export default class Rank extends Mixins(playListMixin) {
   @Mutation private [SET_TOP_LIST]!: (topList: any) => void;
 
   private topList: Array<any> = [];

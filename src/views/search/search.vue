@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator';
+import { Component, Vue, Watch, Mixins } from 'vue-property-decorator';
 import SearchBox from '@/base/search-box/search-box.vue';
 import searchApi from '@/api/search';
 import { ERR_OK } from '@/api/config';
@@ -55,9 +55,8 @@ import { playListMixin } from '@/assets/js/mixin';
     Confirm,
     Scroll,
   },
-  mixins: [playListMixin],
 })
-export default class Search extends Vue {
+export default class Search extends Mixins(playListMixin) {
   @State private searchHistory!: Array<any>;
   @Action saveSearchHistory!: (query: string) => void;
   @Action deleteSearchHistory!: (query: string) => void;

@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Watch, Vue } from 'vue-property-decorator';
+import { Component, Prop, Watch, Vue, Mixins } from 'vue-property-decorator';
 import Scroll from '@/base/scroll/scroll.vue';
 import SongList from '@/base/song-list/song-list.vue';
 import Loading from '@/base/loading/loading.vue';
@@ -44,9 +44,8 @@ const backdrop = prefixStyle('backdrop-filter');
     SongList,
     Loading,
   },
-  mixins: [playListMixin],
 })
-export default class MusicList extends Vue {
+export default class MusicList extends Mixins(playListMixin) {
   @Prop({ default: '' })
   private bgImage!: string;
   @Prop({ default: () => [] })
