@@ -1,11 +1,11 @@
 import { Component, Vue, Watch } from 'vue-property-decorator';
-import { State, Mutation, Getter } from 'vuex-class';
+import { State, Mutation, Getter, Action } from 'vuex-class';
 import { PlayMode } from '@/assets/js/config';
 import { shuffle } from '@/assets/js/util';
 import { SET_CURRENT_INDEX, SET_PLAY_MODE, SET_PLAY_LIST } from '@/store/types';
 
 @Component
-export class playListMixin extends Vue {
+export class PlayListMixin extends Vue {
   @State private playList!: Array<any>;
 
   mounted() {
@@ -26,7 +26,7 @@ export class playListMixin extends Vue {
 }
 
 @Component
-export class playerMixin extends Vue {
+export class PlayerMixin extends Vue {
   @State public mode!: number;
   @State public sequenceList!: Array<any>;
   @Getter public currentSong!: Song;
@@ -57,5 +57,21 @@ export class playerMixin extends Vue {
       : this.mode === PlayMode.Loop
         ? 'icon-loop'
         : 'icon-random';
+  }
+}
+
+@Component
+export class SearchMixin extends Vue {
+  @State public searchHistory!: Array<any>;
+  @Action saveSearchHistory!: (query: string) => void;
+  @Action deleteSearchHistory!: (query: string) => void;
+
+  public query: string = '';
+
+  queryChange(query: string) {
+    this.query = query;
+  }
+  saveSearch() {
+    this.saveSearchHistory(this.query);
   }
 }

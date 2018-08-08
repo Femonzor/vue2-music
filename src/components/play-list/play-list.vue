@@ -24,7 +24,7 @@
           </transition-group>
         </scroll>
         <div class="list-operate">
-          <div class="add">
+          <div class="add" @click="addSong">
             <i class="icon-add"></i>
             <span class="text">添加歌曲到队列</span>
           </div>
@@ -34,6 +34,7 @@
         </div>
       </div>
       <confirm @confirm="confirmClear" ref="confirm" text="是否清空播放列表?"></confirm>
+      <add-song ref="addSong"></add-song>
     </div>
   </transition>
 </template>
@@ -46,15 +47,17 @@ import Scroll from '@/base/scroll/scroll.vue';
 import { setTimeout } from 'timers';
 import { PlayMode } from '@/assets/js/config';
 import Confirm from '@/base/confirm/confirm.vue';
-import { playerMixin } from '@/assets/js/mixin';
+import { PlayerMixin } from '@/assets/js/mixin';
+import AddSong from '@/components/add-song/add-song.vue';
 
 @Component({
   components: {
     Scroll,
     Confirm,
+    AddSong,
   },
 })
-export default class PlayList extends Mixins(playerMixin) {
+export default class PlayList extends Mixins(PlayerMixin) {
   @State private playList!: Array<any>;
   @Mutation private [SET_PLAYING]!: (playing: boolean) => void;
   @Action deleteSong!: (song: Song) => void;
@@ -66,6 +69,7 @@ export default class PlayList extends Mixins(playerMixin) {
     scroll: Scroll;
     listItem: Array<HTMLLIElement>;
     confirm: Confirm;
+    addSong: AddSong;
   };
 
   show() {
@@ -109,6 +113,9 @@ export default class PlayList extends Mixins(playerMixin) {
   confirmClear() {
     this.deleteSongList();
     this.hide();
+  }
+  addSong() {
+    this.$refs.addSong.show();
   }
 
   get modeText() {

@@ -109,7 +109,7 @@ import Lyric from 'lyric-parser';
 import Scroll from '@/base/scroll/scroll.vue';
 import { setTimeout } from 'timers';
 import PlayList from '@/components/play-list/play-list.vue';
-import { playerMixin } from '@/assets/js/mixin';
+import { PlayerMixin } from '@/assets/js/mixin';
 
 const transform = prefixStyle('transform');
 const transition = prefixStyle('transition');
@@ -124,7 +124,7 @@ const animation = prefixStyle('animation');
     PlayList,
   },
 })
-export default class Player extends Mixins(playerMixin) {
+export default class Player extends Mixins(PlayerMixin) {
   @State private fullScreen!: boolean;
   @State private playList!: Array<any>;
   @State private playing!: boolean;

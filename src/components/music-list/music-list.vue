@@ -32,7 +32,7 @@ import SongList from '@/base/song-list/song-list.vue';
 import Loading from '@/base/loading/loading.vue';
 import { prefixStyle } from '@/assets/js/dom';
 import { Action } from 'vuex-class';
-import { playListMixin } from '@/assets/js/mixin';
+import { PlayListMixin } from '@/assets/js/mixin';
 
 const RESERVED_HEIGHT = 40;
 const transform = prefixStyle('transform');
@@ -45,7 +45,7 @@ const backdrop = prefixStyle('backdrop-filter');
     Loading,
   },
 })
-export default class MusicList extends Mixins(playListMixin) {
+export default class MusicList extends Mixins(PlayListMixin) {
   @Prop({ default: '' })
   private bgImage!: string;
   @Prop({ default: () => [] })

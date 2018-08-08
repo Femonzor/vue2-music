@@ -28,7 +28,7 @@ import rankApi from '@/api/rank';
 import { ERR_OK } from '@/api/config';
 import Scroll from '@/base/scroll/scroll.vue';
 import Loading from '@/base/loading/loading.vue';
-import { playListMixin } from '@/assets/js/mixin';
+import { PlayListMixin } from '@/assets/js/mixin';
 import { Mutation } from 'vuex-class';
 import { SET_TOP_LIST } from '@/store/types';
 
@@ -38,7 +38,7 @@ import { SET_TOP_LIST } from '@/store/types';
     Loading,
   },
 })
-export default class Rank extends Mixins(playListMixin) {
+export default class Rank extends Mixins(PlayListMixin) {
   @Mutation private [SET_TOP_LIST]!: (topList: any) => void;
 
   private topList: Array<any> = [];

@@ -13,7 +13,7 @@ import Singer from '@/assets/js/singer';
 import ListView from '@/base/listview/listview.vue';
 import { Mutation } from 'vuex-class';
 import { SET_SINGER } from '@/store/types';
-import { playListMixin } from '@/assets/js/mixin';
+import { PlayListMixin } from '@/assets/js/mixin';
 
 const HOT_NAME = '热门';
 const HOT_SINGER_LENGTH = 10;
@@ -23,7 +23,7 @@ const HOT_SINGER_LENGTH = 10;
     ListView,
   },
 })
-export default class Singers extends Mixins(playListMixin) {
+export default class Singers extends Mixins(PlayListMixin) {
   @Mutation private [SET_SINGER]!: (singer: Music.Singer) => void;
 
   private singers: Music.SingerGroup[] = [];

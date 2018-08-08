@@ -41,7 +41,7 @@ import Scroll from '@/base/scroll/scroll.vue';
 import Loading from '@/base/loading/loading.vue';
 import recommendApi from '@/api/recommend';
 import { ERR_OK } from '@/api/config';
-import { playListMixin } from '@/assets/js/mixin';
+import { PlayListMixin } from '@/assets/js/mixin';
 import { Mutation } from 'vuex-class';
 import { SET_DISC } from '@/store/types';
 
@@ -52,7 +52,7 @@ import { SET_DISC } from '@/store/types';
     Loading,
   },
 })
-export default class Recommends extends Mixins(playListMixin) {
+export default class Recommends extends Mixins(PlayListMixin) {
   @Mutation private [SET_DISC]!: (disc: any) => void;
 
   private recommends: Array<any> = [];

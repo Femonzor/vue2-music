@@ -46,4 +46,8 @@ declare namespace Music {
   export interface SingerMap {
     [index: string]: SingerGroup,
   }
+
+  export interface Switch {
+    name: string,
+  }
 }

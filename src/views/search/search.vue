@@ -45,7 +45,7 @@ import SearchList from '@/base/search-list/search-list.vue';
 import Confirm from '@/base/confirm/confirm.vue';
 import Scroll from '@/base/scroll/scroll.vue';
 import { setTimeout } from 'timers';
-import { playListMixin } from '@/assets/js/mixin';
+import { PlayListMixin, SearchMixin } from '@/assets/js/mixin';
 
 @Component({
   components: {
@@ -56,14 +56,10 @@ import { playListMixin } from '@/assets/js/mixin';
     Scroll,
   },
 })
-export default class Search extends Mixins(playListMixin) {
-  @State private searchHistory!: Array<any>;
-  @Action saveSearchHistory!: (query: string) => void;
-  @Action deleteSearchHistory!: (query: string) => void;
+export default class Search extends Mixins(PlayListMixin, SearchMixin) {
   @Action clearSearchHistory!: () => void;
 
   private hotkey: Array<any> = [];
-  private query: string = '';
 
   $refs!: {
     searchBox: SearchBox;
@@ -82,17 +78,11 @@ export default class Search extends Mixins(playListMixin) {
       console.log(response);
     }
   }
-  addQuery(query: string) {
-    this.$refs.searchBox.setQuery(query);
-  }
-  queryChange(query: string) {
-    this.query = query;
-  }
   blurInput() {
     this.$refs.searchBox.blur();
   }
-  saveSearch() {
-    this.saveSearchHistory(this.query);
+  addQuery(query: string) {
+    this.$refs.searchBox.setQuery(query);
   }
   deleteSearch(item: string) {
     this.deleteSearchHistory(item);
