@@ -89,7 +89,7 @@
 
 <script lang="ts">
 import { Component, Vue, Watch, Mixins } from 'vue-property-decorator';
-import { State, Getter, Mutation } from 'vuex-class';
+import { State, Getter, Mutation, Action } from 'vuex-class';
 import {
   SET_FULL_SCREEN,
   SET_CURRENT_SONG_URL,
@@ -129,6 +129,7 @@ export default class Player extends Mixins(PlayerMixin) {
   @State private playList!: Array<any>;
   @State private playing!: boolean;
   @State private currentIndex!: number;
+  @Action savePlayHistory!: (song: Song) => void;
   @Mutation private [SET_FULL_SCREEN]!: (fullScreen: boolean) => void;
   @Mutation private [SET_CURRENT_SONG_URL]!: (url: string) => void;
   @Mutation private [SET_PLAYING]!: (playing: boolean) => void;
@@ -263,6 +264,7 @@ export default class Player extends Mixins(PlayerMixin) {
   }
   ready() {
     this.songReady = true;
+    this.savePlayHistory(this.currentSong);
   }
   error() {
     this.songReady = true;

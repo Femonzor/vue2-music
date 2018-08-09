@@ -30,6 +30,7 @@ declare namespace Music {
     disc: any,
     topList: any,
     searchHistory: Array<any>,
+    playHistory: Array<any>,
   }
 
   export interface Singer {

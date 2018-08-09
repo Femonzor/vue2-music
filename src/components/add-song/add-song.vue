@@ -12,8 +12,15 @@
       <div class="search-box-wrapper">
         <search-box @query="queryChange" placeholder="搜索歌曲"></search-box>
       </div>
-      <div class="shortcur" v-show="!query">
+      <div class="shortcut" v-show="!query">
         <switches :switches="switches" :currentIndex="currentIndex" @switch="switchItem"></switches>
+        <div class="list-wrapper">
+          <scroll v-if="currentIndex === 0" :data="playHistory" class="list-scroll">
+            <div class="list-inner">
+              <song-list :songs="playHistory" @select="selectSong"></song-list>
+            </div>
+          </scroll>
+        </div>
       </div>
       <div class="search-result" v-show="query">
         <suggest :query="query" :showSinger="showSinger" @select="selectSuggest" @listScroll="blurInput"></suggest>
@@ -28,15 +35,23 @@ import SearchBox from '@/base/search-box/search-box.vue';
 import Suggest from '@/components/suggest/suggest.vue';
 import { SearchMixin } from '@/assets/js/mixin';
 import Switches from '@/base/switches/switches.vue';
+import Scroll from '@/base/scroll/scroll.vue';
+import { State, Action } from 'vuex-class';
+import SongList from '@/base/song-list/song-list.vue';
 
 @Component({
   components: {
     SearchBox,
     Suggest,
     Switches,
+    Scroll,
+    SongList,
   },
 })
 export default class AddSong extends Mixins(SearchMixin) {
+  @State private playHistory!: Array<any>;
+  @Action insertSong!: (obj: any) => void;
+
   private showFlag: boolean = false;
   private showSinger: boolean = false;
   private currentIndex: number = 0;
@@ -67,6 +82,13 @@ export default class AddSong extends Mixins(SearchMixin) {
   }
   switchItem(index: number) {
     this.currentIndex = index;
+  }
+  selectSong(song: Song, index: number) {
+    if (index !== 0) {
+      this.insertSong({
+        song,
+      });
+    }
   }
 }
 </script>

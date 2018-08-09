@@ -2,7 +2,7 @@ import { ActionTree } from 'vuex';
 import * as types from '@/store/types';
 import { PlayMode } from '@/assets/js/config';
 import { shuffle } from '@/assets/js/util';
-import { saveSearch, deleteSearch, clearSearch } from '@/assets/js/cache';
+import { saveSearch, deleteSearch, clearSearch, savePlay } from '@/assets/js/cache';
 
 const findIndex = (list: Array<any>, song: any) => {
   return list.findIndex(item => {
@@ -97,6 +97,9 @@ const actions: ActionTree<Music.State, any> = {
   },
   clearSearchHistory({ commit }) {
     commit(types.SET_SEARCH_HISTORY, clearSearch());
+  },
+  savePlayHistory({ commit }, song) {
+    commit(types.SET_PLAY_HISTORY, savePlay(song));
   },
 };
 

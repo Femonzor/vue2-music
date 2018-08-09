@@ -39,6 +39,9 @@ const mutations: MutationTree<any> = {
   [types.SET_SEARCH_HISTORY](state: Music.State, searchHistory: Array<any>): void {
     state.searchHistory = searchHistory;
   },
+  [types.SET_PLAY_HISTORY](state: Music.State, playHistory: Array<any>): void {
+    state.playHistory = playHistory;
+  },
 };
 
 export default mutations;

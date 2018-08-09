@@ -1,7 +1,9 @@
 import storage from 'good-storage';
 
 const SEARCH_KEY = '__search__';
+const PLAY_KEY = '__play__';
 const SEARCH_MAX_LENGTH = 15;
+const PLAY_MAX_LENGTH = 200;
 
 // compare is callback function, cannot find suitable type, so use any
 const insertArray = (array: Array<any>, val: any, compare: any, maxLen: number) => {
@@ -38,4 +40,15 @@ export const deleteSearch = (query: string) => {
 export const clearSearch = () => {
   storage.remove(SEARCH_KEY);
   return [];
-}
+};
+
+export const savePlay = (song: Song) => {
+  let songs = storage.get(PLAY_KEY, []);
+  insertArray(songs, song, (item: any) => item.id === song.id, PLAY_MAX_LENGTH);
+  storage.set(PLAY_KEY, songs);
+  return songs;
+};
+
+export const loadPlay = () => {
+  return storage.get(PLAY_KEY, []);
+};
