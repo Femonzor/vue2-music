@@ -10,14 +10,19 @@
         </div>
       </div>
       <div class="search-box-wrapper">
-        <search-box @query="queryChange" placeholder="搜索歌曲"></search-box>
+        <search-box ref="searchBox" @query="queryChange" placeholder="搜索歌曲"></search-box>
       </div>
       <div class="shortcut" v-show="!query">
         <switches :switches="switches" :currentIndex="currentIndex" @switch="switchItem"></switches>
         <div class="list-wrapper">
-          <scroll v-if="currentIndex === 0" :data="playHistory" class="list-scroll">
+          <scroll ref="songList" v-if="currentIndex === 0" :data="playHistory" class="list-scroll">
             <div class="list-inner">
               <song-list :songs="playHistory" @select="selectSong"></song-list>
+            </div>
+          </scroll>
+          <scroll ref="searchList" class="list-scroll" v-if="currentIndex === 1" :data="searchHistory">
+            <div class="list-inner">
+              <search-list @delete="deleteSearchHistory" @select="addQuery" :searches="searchHistory"></search-list>
             </div>
           </scroll>
         </div>
@@ -25,6 +30,12 @@
       <div class="search-result" v-show="query">
         <suggest :query="query" :showSinger="showSinger" @select="selectSuggest" @listScroll="blurInput"></suggest>
       </div>
+      <top-tip ref="topTip">
+        <div class="tip-title">
+          <i class="icon-ok"></i>
+          <span class="text">1首歌曲已经添加到播放队列</span>
+        </div>
+      </top-tip>
     </div>
   </transition>
 </template>
@@ -38,6 +49,9 @@ import Switches from '@/base/switches/switches.vue';
 import Scroll from '@/base/scroll/scroll.vue';
 import { State, Action } from 'vuex-class';
 import SongList from '@/base/song-list/song-list.vue';
+import SearchList from '@/base/search-list/search-list.vue';
+import { setTimeout } from 'timers';
+import TopTip from '@/base/top-tip/top-tip.vue';
 
 @Component({
   components: {
@@ -46,6 +60,8 @@ import SongList from '@/base/song-list/song-list.vue';
     Switches,
     Scroll,
     SongList,
+    SearchList,
+    TopTip,
   },
 })
 export default class AddSong extends Mixins(SearchMixin) {
@@ -66,19 +82,33 @@ export default class AddSong extends Mixins(SearchMixin) {
 
   $refs!: {
     searchBox: SearchBox;
+    songList: Scroll;
+    searchList: Scroll;
+    topTip: TopTip;
   };
 
   show() {
     this.showFlag = true;
+    setTimeout(() => {
+      if (this.currentIndex === 0) {
+        this.$refs.songList.refresh();
+      } else {
+        this.$refs.searchList.refresh();
+      }
+    }, 20);
   }
   hide() {
     this.showFlag = false;
   }
   selectSuggest() {
     this.saveSearch();
+    this.showTip();
   }
   blurInput() {
     this.$refs.searchBox.blur();
+  }
+  addQuery(query: string) {
+    this.$refs.searchBox.setQuery(query);
   }
   switchItem(index: number) {
     this.currentIndex = index;
@@ -88,7 +118,11 @@ export default class AddSong extends Mixins(SearchMixin) {
       this.insertSong({
         song,
       });
+      this.showTip();
     }
+  }
+  showTip() {
+    this.$refs.topTip.show();
   }
 }
 </script>
