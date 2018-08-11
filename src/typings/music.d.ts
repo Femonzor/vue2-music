@@ -31,6 +31,7 @@ declare namespace Music {
     topList: any,
     searchHistory: Array<any>,
     playHistory: Array<any>,
+    favoriteList: Array<any>,
   }
 
   export interface Singer {

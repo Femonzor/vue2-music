@@ -1,4 +1,4 @@
-import { loadSearch, loadPlay } from '@/assets/js/cache';
+import { loadSearch, loadPlay, loadFavorite } from '@/assets/js/cache';
 import { PlayMode } from '@/assets/js/config';
 
 const state: Music.State = {
@@ -17,6 +17,7 @@ const state: Music.State = {
   topList: {},
   searchHistory: loadSearch(),
   playHistory: loadPlay(),
+  favoriteList: loadFavorite(),
 };
 
 export default state;

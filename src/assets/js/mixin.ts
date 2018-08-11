@@ -29,10 +29,13 @@ export class PlayListMixin extends Vue {
 export class PlayerMixin extends Vue {
   @State public mode!: number;
   @State public sequenceList!: Array<any>;
+  @State public favoriteList!: Array<any>;
   @Getter public currentSong!: Song;
   @Mutation public [SET_CURRENT_INDEX]!: (currentIndex: number) => void;
   @Mutation public [SET_PLAY_MODE]!: (mode: PlayMode) => void;
   @Mutation public [SET_PLAY_LIST]!: (playList: Array<any>) => void;
+  @Action saveFavoriteLIst!: (song: any) => void;
+  @Action deleteFavoriteList!: (song: any) => void;
 
   changeMode() {
     const mode = (this.mode + 1) % 3;
@@ -49,6 +52,21 @@ export class PlayerMixin extends Vue {
   resetCurrentIndex(list: Array<any>) {
     let index = list.findIndex((item: any) => item.id === this.currentSong.id);
     this.SET_CURRENT_INDEX(index);
+  }
+  getFavoriteIcon(song: Song) {
+    if (this.isFavorite(song)) return 'icon-favorite';
+    return 'icon-not-favorite';
+  }
+  toggleFavorite(song: Song) {
+    if (this.isFavorite(song)) {
+      this.deleteFavoriteList(song);
+    } else {
+      this.saveFavoriteLIst(song);
+    }
+  }
+  isFavorite(song: Song) {
+    const index = this.favoriteList.findIndex((item: Song) => item.id === song.id);
+    return index > -1;
   }
 
   get iconMode() {

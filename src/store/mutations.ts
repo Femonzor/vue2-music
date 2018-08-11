@@ -42,6 +42,9 @@ const mutations: MutationTree<any> = {
   [types.SET_PLAY_HISTORY](state: Music.State, playHistory: Array<any>): void {
     state.playHistory = playHistory;
   },
+  [types.SET_FAVORITE_LIST](state: Music.State, favoriteList: Array<any>): void {
+    state.favoriteList = favoriteList;
+  },
 };
 
 export default mutations;
