@@ -1,15 +1,55 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Rank from '@/views/rank/rank.vue';
-import Recommends from '@/views/recommends/recommends.vue';
-import Search from '@/views/search/search.vue';
-import Singers from '@/views/singers/singers.vue';
-import Singer from '@/views/singer/singer.vue';
-import Disc from '@/views/disc/disc.vue';
-import TopList from '@/views/top-list/top-list.vue';
-import UserCenter from '@/views/user-center/user-center.vue';
 
 Vue.use(Router);
+
+const Recommends = (resolve: Function) => {
+  import('@/views/recommends/recommends.vue').then(module => {
+    resolve(module);
+  });
+};
+
+const Singer = (resolve: Function) => {
+  import('@/views/singer/singer.vue').then(module => {
+    resolve(module);
+  });
+};
+
+const Rank = (resolve: Function) => {
+  import('@/views/rank/rank.vue').then(module => {
+    resolve(module);
+  });
+};
+
+const Singers = (resolve: Function) => {
+  import('@/views/singers/singers.vue').then(module => {
+    resolve(module);
+  });
+};
+
+const Disc = (resolve: Function) => {
+  import('@/views/disc/disc.vue').then(module => {
+    resolve(module);
+  });
+};
+
+const Search = (resolve: Function) => {
+  import('@/views/search/search.vue').then(module => {
+    resolve(module);
+  });
+};
+
+const TopList = (resolve: Function) => {
+  import('@/views/top-list/top-list.vue').then(module => {
+    resolve(module);
+  });
+};
+
+const UserCenter = (resolve: Function) => {
+  import('@/views/user-center/user-center.vue').then(module => {
+    resolve(module);
+  });
+};
 
 export default new Router({
   routes: [

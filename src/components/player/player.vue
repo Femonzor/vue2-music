@@ -83,7 +83,7 @@
       </div>
     </transition>
     <play-list ref="playList"></play-list>
-    <audio :src="currentSong.url" ref="audio" @canplay="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
+    <audio :src="currentSong.url" ref="audio" @play="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
   </div>
 </template>
 
@@ -107,7 +107,7 @@ import { PlayMode } from '@/assets/js/config';
 import { shuffle } from '@/assets/js/util';
 import Lyric from 'lyric-parser';
 import Scroll from '@/base/scroll/scroll.vue';
-import { setTimeout } from 'timers';
+import { setTimeout, clearTimeout } from 'timers';
 import PlayList from '@/components/play-list/play-list.vue';
 import { PlayerMixin } from '@/assets/js/mixin';
 
@@ -143,6 +143,7 @@ export default class Player extends Mixins(PlayerMixin) {
   private currentShow: string = 'cd';
   private touch: any = {};
   private playingLyric: string = '';
+  private timer!: NodeJS.Timer;
 
   $refs!: {
     cdWrapper: HTMLDivElement;
@@ -234,6 +235,7 @@ export default class Player extends Mixins(PlayerMixin) {
     if (!this.songReady) return;
     if (this.playList.length === 1) {
       this.loop();
+      return;
     } else {
       let index = this.currentIndex - 1;
       if (index === -1) {
@@ -250,6 +252,7 @@ export default class Player extends Mixins(PlayerMixin) {
     if (!this.songReady) return;
     if (this.playList.length === 1) {
       this.loop();
+      return;
     } else {
       let index = this.currentIndex + 1;
       if (index === this.playList.length) {
@@ -378,7 +381,8 @@ export default class Player extends Mixins(PlayerMixin) {
       song.mid
     }.m4a?vkey=${vKey}&guid=${guid}&uin=0&fromtag=66`;
     this.SET_CURRENT_SONG_URL(url);
-    setTimeout(async () => {
+    clearTimeout(this.timer);
+    this.timer = setTimeout(async () => {
       this.$refs.audio.play();
       await this.getLyric();
     }, 1000);
